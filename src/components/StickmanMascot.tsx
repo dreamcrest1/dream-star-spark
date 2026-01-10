@@ -327,7 +327,7 @@ const StickmanMascot = () => {
             />
           </motion.g>
 
-          {/* Left Arm - 3D */}
+          {/* Left Arm - 3D with continuous movement */}
           <motion.path
             d={isWaving 
               ? "M 42 60 Q 25 45 20 30" 
@@ -339,55 +339,106 @@ const StickmanMascot = () => {
             strokeLinecap="round"
             animate={isWaving ? { 
               d: ["M 42 60 Q 25 45 20 30", "M 42 60 Q 20 40 15 25", "M 42 60 Q 25 45 20 30"]
-            } : {}}
-            transition={{ duration: 0.3, repeat: isWaving ? 4 : 0 }}
+            } : {
+              d: ["M 42 60 Q 30 70 25 85", "M 42 60 Q 28 65 22 78", "M 42 60 Q 32 72 28 88", "M 42 60 Q 30 70 25 85"]
+            }}
+            transition={isWaving ? { duration: 0.3, repeat: 4 } : { duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
           />
           {/* Left hand */}
           <motion.circle
-            cx={isWaving ? 20 : 25}
-            cy={isWaving ? 30 : 85}
             r="6"
             fill="url(#headGradient3D)"
             stroke="url(#headStroke)"
             strokeWidth="1"
+            animate={isWaving ? {
+              cx: [20, 15, 20],
+              cy: [30, 25, 30]
+            } : {
+              cx: [25, 22, 28, 25],
+              cy: [85, 78, 88, 85]
+            }}
+            transition={isWaving ? { duration: 0.3, repeat: 4 } : { duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
           />
 
-          {/* Right Arm - 3D */}
+          {/* Right Arm - 3D with continuous movement */}
           <motion.path
-            d="M 78 60 Q 90 70 95 85"
             fill="none"
             stroke="url(#armGradient)"
             strokeWidth="8"
             strokeLinecap="round"
+            animate={{
+              d: ["M 78 60 Q 90 70 95 85", "M 78 60 Q 92 65 98 78", "M 78 60 Q 88 72 92 88", "M 78 60 Q 90 70 95 85"]
+            }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.75 }}
           />
           {/* Right hand */}
-          <circle cx="95" cy="85" r="6" fill="url(#headGradient3D)" stroke="url(#headStroke)" strokeWidth="1" />
+          <motion.circle
+            r="6"
+            fill="url(#headGradient3D)"
+            stroke="url(#headStroke)"
+            strokeWidth="1"
+            animate={{
+              cx: [95, 98, 92, 95],
+              cy: [85, 78, 88, 85]
+            }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.75 }}
+          />
 
-          {/* Left Leg - 3D */}
+          {/* Left Leg - 3D with continuous walking motion */}
           <motion.path
-            d="M 52 100 Q 45 115 40 130"
             fill="none"
             stroke="url(#legGradient)"
             strokeWidth="10"
             strokeLinecap="round"
-            animate={isDancing ? { d: ["M 52 100 Q 45 115 40 130", "M 52 100 Q 40 110 35 125", "M 52 100 Q 45 115 40 130"] } : {}}
-            transition={{ duration: 0.25, repeat: isDancing ? 6 : 0 }}
+            animate={isDancing ? { 
+              d: ["M 52 100 Q 45 115 40 130", "M 52 100 Q 40 110 35 125", "M 52 100 Q 45 115 40 130"] 
+            } : {
+              d: ["M 52 100 Q 45 115 40 130", "M 52 100 Q 48 112 45 128", "M 52 100 Q 42 118 38 132", "M 52 100 Q 45 115 40 130"]
+            }}
+            transition={isDancing ? { duration: 0.25, repeat: 6 } : { duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
           />
           {/* Left foot */}
-          <ellipse cx="40" cy="132" rx="8" ry="4" fill="hsl(var(--neon-purple))" />
+          <motion.ellipse
+            rx="8"
+            ry="4"
+            fill="hsl(var(--neon-purple))"
+            animate={isDancing ? {
+              cx: [40, 35, 40],
+              cy: [132, 127, 132]
+            } : {
+              cx: [40, 45, 38, 40],
+              cy: [132, 128, 134, 132]
+            }}
+            transition={isDancing ? { duration: 0.25, repeat: 6 } : { duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+          />
 
-          {/* Right Leg - 3D */}
+          {/* Right Leg - 3D with continuous walking motion */}
           <motion.path
-            d="M 68 100 Q 75 115 80 130"
             fill="none"
             stroke="url(#legGradient)"
             strokeWidth="10"
             strokeLinecap="round"
-            animate={isDancing ? { d: ["M 68 100 Q 75 115 80 130", "M 68 100 Q 80 110 85 125", "M 68 100 Q 75 115 80 130"] } : {}}
-            transition={{ duration: 0.25, repeat: isDancing ? 6 : 0, delay: 0.125 }}
+            animate={isDancing ? { 
+              d: ["M 68 100 Q 75 115 80 130", "M 68 100 Q 80 110 85 125", "M 68 100 Q 75 115 80 130"] 
+            } : {
+              d: ["M 68 100 Q 75 115 80 130", "M 68 100 Q 78 118 82 132", "M 68 100 Q 72 112 75 128", "M 68 100 Q 75 115 80 130"]
+            }}
+            transition={isDancing ? { duration: 0.25, repeat: 6, delay: 0.125 } : { duration: 1.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
           />
           {/* Right foot */}
-          <ellipse cx="80" cy="132" rx="8" ry="4" fill="hsl(var(--neon-purple))" />
+          <motion.ellipse
+            rx="8"
+            ry="4"
+            fill="hsl(var(--neon-purple))"
+            animate={isDancing ? {
+              cx: [80, 85, 80],
+              cy: [132, 127, 132]
+            } : {
+              cx: [80, 82, 75, 80],
+              cy: [132, 134, 128, 132]
+            }}
+            transition={isDancing ? { duration: 0.25, repeat: 6, delay: 0.125 } : { duration: 1.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
+          />
 
           {/* Cape */}
           <motion.path

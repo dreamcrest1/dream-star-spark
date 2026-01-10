@@ -9,13 +9,25 @@ const MusicToggle = () => {
   const soundRef = useRef<Howl | null>(null);
 
   useEffect(() => {
-    // Cyberpunk ambient music - royalty free
+    // Free cyberpunk/synthwave ambient music
     soundRef.current = new Howl({
-      src: ['https://cdn.pixabay.com/audio/2022/10/25/audio_fd5eed2b6d.mp3'],
+      src: ['https://cdn.pixabay.com/audio/2022/03/10/audio_cc684e8f82.mp3'],
       loop: true,
-      volume: 0.25,
+      volume: 0.3,
+      html5: true, // Enable HTML5 Audio to avoid CORS issues
       onload: () => setIsLoaded(true),
-      onloaderror: () => console.log('Music failed to load'),
+      onloaderror: (id, error) => {
+        console.log('Music failed to load, trying fallback...', error);
+        // Try fallback URL
+        soundRef.current = new Howl({
+          src: ['https://cdn.pixabay.com/audio/2021/11/25/audio_91b32e02f9.mp3'],
+          loop: true,
+          volume: 0.3,
+          html5: true,
+          onload: () => setIsLoaded(true),
+          onloaderror: () => console.log('Fallback also failed'),
+        });
+      },
     });
 
     return () => {

@@ -1,3 +1,7 @@
+# Dreamstar Solution - robots.txt
+# https://dreamstarsolution.com
+
+# Allow major search engines
 User-agent: Googlebot
 Allow: /
 
@@ -10,5 +14,33 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Default rule for all other bots
 User-agent: *
 Allow: /
+
+# Disallow unnecessary paths
+Disallow: /assets/
+Disallow: /*.json$
+Disallow: /api/
+
+# Crawl-delay for aggressive bots
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+User-agent: MJ12bot
+Crawl-delay: 10
+
+User-agent: DotBot
+Crawl-delay: 10
+
+# Sitemap location
+Sitemap: https://dreamstarsolution.com/sitemap.xml

@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Gamepad2, X, RotateCcw, ChevronLeft, Bird, Zap, Grid3X3, Target } from 'lucide-react';
+import { Gamepad2, X, RotateCcw, ChevronLeft, Bird, Zap, Grid3X3, Target, Hash, Circle, Palette, Calculator, MousePointer, Square } from 'lucide-react';
 
 const CANVAS_WIDTH = 200;
 const CANVAS_HEIGHT = 280;
 
-type GameType = 'menu' | 'flappy' | 'snake' | 'memory' | 'reaction';
+type GameType = 'menu' | 'flappy' | 'snake' | 'memory' | 'reaction' | 'tictactoe' | 'pong' | 'colormatch' | 'mathquiz' | 'whackamole' | 'brickbreaker';
 
 // ============= FLAPPY GAME =============
 const BIRD_SIZE = 20;
@@ -268,7 +268,6 @@ const SnakeGame = ({ onBack }: { onBack: () => void }) => {
         </div>
       </div>
 
-      {/* Controls */}
       <div className="absolute bottom-2 left-1/2 -translate-x-1/2 grid grid-cols-3 gap-1">
         <div />
         <button onClick={() => handleDirection({ x: 0, y: -1 })} className="p-2 bg-muted rounded hover:bg-muted/80">↑</button>
@@ -485,6 +484,804 @@ const ReactionGame = ({ onBack }: { onBack: () => void }) => {
   );
 };
 
+// ============= TIC TAC TOE GAME =============
+const TicTacToeGame = ({ onBack }: { onBack: () => void }) => {
+  const [board, setBoard] = useState<(string | null)[]>(Array(9).fill(null));
+  const [isPlayerTurn, setIsPlayerTurn] = useState(true);
+  const [winner, setWinner] = useState<string | null>(null);
+  const [wins, setWins] = useState(() => {
+    const saved = localStorage.getItem('tictactoeWins');
+    return saved ? parseInt(saved) : 0;
+  });
+
+  const checkWinner = (squares: (string | null)[]) => {
+    const lines = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
+    for (const [a, b, c] of lines) {
+      if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+        return squares[a];
+      }
+    }
+    return null;
+  };
+
+  const aiMove = useCallback((currentBoard: (string | null)[]) => {
+    const empty = currentBoard.map((v, i) => v === null ? i : -1).filter(i => i !== -1);
+    if (empty.length === 0) return;
+    
+    // Simple AI: try to win, block, or random
+    for (const idx of empty) {
+      const test = [...currentBoard];
+      test[idx] = 'O';
+      if (checkWinner(test) === 'O') {
+        setTimeout(() => {
+          setBoard(test);
+          setWinner('O');
+        }, 300);
+        return;
+      }
+    }
+    
+    for (const idx of empty) {
+      const test = [...currentBoard];
+      test[idx] = 'X';
+      if (checkWinner(test) === 'X') {
+        const block = [...currentBoard];
+        block[idx] = 'O';
+        setTimeout(() => {
+          setBoard(block);
+          setIsPlayerTurn(true);
+        }, 300);
+        return;
+      }
+    }
+    
+    const randomIdx = empty[Math.floor(Math.random() * empty.length)];
+    const newBoard = [...currentBoard];
+    newBoard[randomIdx] = 'O';
+    setTimeout(() => {
+      setBoard(newBoard);
+      if (checkWinner(newBoard) === 'O') {
+        setWinner('O');
+      } else {
+        setIsPlayerTurn(true);
+      }
+    }, 300);
+  }, []);
+
+  const handleClick = (index: number) => {
+    if (board[index] || winner || !isPlayerTurn) return;
+    
+    const newBoard = [...board];
+    newBoard[index] = 'X';
+    setBoard(newBoard);
+    
+    const win = checkWinner(newBoard);
+    if (win) {
+      setWinner(win);
+      if (win === 'X') {
+        const newWins = wins + 1;
+        setWins(newWins);
+        localStorage.setItem('tictactoeWins', newWins.toString());
+      }
+    } else if (!newBoard.includes(null)) {
+      setWinner('draw');
+    } else {
+      setIsPlayerTurn(false);
+      aiMove(newBoard);
+    }
+  };
+
+  const resetGame = () => {
+    setBoard(Array(9).fill(null));
+    setIsPlayerTurn(true);
+    setWinner(null);
+  };
+
+  return (
+    <div className="relative bg-background p-3" style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}>
+      <div className="flex items-center justify-between mb-2">
+        <button onClick={onBack} className="p-1 hover:bg-muted rounded">
+          <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+        </button>
+        <span className="text-xs text-neon-cyan">Wins: {wins}</span>
+        <button onClick={resetGame} className="p-1 hover:bg-muted rounded">
+          <RotateCcw className="w-3 h-3 text-muted-foreground" />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2 mt-6 mx-auto" style={{ width: 150 }}>
+        {board.map((cell, i) => (
+          <motion.button
+            key={i}
+            onClick={() => handleClick(i)}
+            className="aspect-square rounded-lg bg-muted hover:bg-muted/80 flex items-center justify-center text-2xl font-bold"
+            whileTap={{ scale: 0.95 }}
+          >
+            {cell === 'X' && <span className="text-neon-cyan">X</span>}
+            {cell === 'O' && <span className="text-neon-pink">O</span>}
+          </motion.button>
+        ))}
+      </div>
+
+      <p className="text-center text-xs mt-4 text-muted-foreground">
+        {!winner && (isPlayerTurn ? 'Your turn (X)' : 'AI thinking...')}
+      </p>
+
+      {winner && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="text-center">
+            <p className="text-sm font-bold mb-2">
+              {winner === 'X' ? '🎉 You Won!' : winner === 'O' ? '😢 AI Wins!' : '🤝 Draw!'}
+            </p>
+            <button onClick={resetGame} className="text-xs text-neon-cyan underline">Play Again</button>
+          </div>
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
+// ============= PONG GAME =============
+const PongGame = ({ onBack }: { onBack: () => void }) => {
+  const [playerY, setPlayerY] = useState(120);
+  const [aiY, setAiY] = useState(120);
+  const [ball, setBall] = useState({ x: 100, y: 140, vx: 2, vy: 1.5 });
+  const [score, setScore] = useState({ player: 0, ai: 0 });
+  const [isPlaying, setIsPlaying] = useState(false);
+  const gameLoopRef = useRef<number>();
+
+  const PADDLE_HEIGHT = 50;
+  const PADDLE_WIDTH = 8;
+  const BALL_SIZE = 8;
+
+  const resetBall = useCallback((direction: number) => {
+    setBall({ x: 100, y: 140, vx: 2 * direction, vy: (Math.random() - 0.5) * 3 });
+  }, []);
+
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const gameLoop = () => {
+      setBall((prev) => {
+        let { x, y, vx, vy } = prev;
+        x += vx;
+        y += vy;
+
+        // Top/bottom bounce
+        if (y <= 0 || y >= CANVAS_HEIGHT - BALL_SIZE) vy = -vy;
+
+        // Player paddle collision
+        if (x <= PADDLE_WIDTH + 5 && y >= playerY && y <= playerY + PADDLE_HEIGHT) {
+          vx = Math.abs(vx) * 1.05;
+          vy += (y - playerY - PADDLE_HEIGHT / 2) * 0.1;
+        }
+
+        // AI paddle collision
+        if (x >= CANVAS_WIDTH - PADDLE_WIDTH - 10 && y >= aiY && y <= aiY + PADDLE_HEIGHT) {
+          vx = -Math.abs(vx) * 1.05;
+          vy += (y - aiY - PADDLE_HEIGHT / 2) * 0.1;
+        }
+
+        // Score
+        if (x <= 0) {
+          setScore((s) => ({ ...s, ai: s.ai + 1 }));
+          resetBall(1);
+          return { x: 100, y: 140, vx: 2, vy: 1.5 };
+        }
+        if (x >= CANVAS_WIDTH) {
+          setScore((s) => ({ ...s, player: s.player + 1 }));
+          resetBall(-1);
+          return { x: 100, y: 140, vx: -2, vy: 1.5 };
+        }
+
+        return { x, y, vx: Math.max(-6, Math.min(6, vx)), vy: Math.max(-4, Math.min(4, vy)) };
+      });
+
+      // Simple AI
+      setAiY((prev) => {
+        const target = ball.y - PADDLE_HEIGHT / 2;
+        const speed = 2;
+        if (prev < target) return Math.min(prev + speed, CANVAS_HEIGHT - PADDLE_HEIGHT);
+        if (prev > target) return Math.max(prev - speed, 0);
+        return prev;
+      });
+
+      gameLoopRef.current = requestAnimationFrame(gameLoop);
+    };
+
+    gameLoopRef.current = requestAnimationFrame(gameLoop);
+    return () => { if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current); };
+  }, [isPlaying, ball.y, playerY, aiY, resetBall]);
+
+  const movePlayer = (dir: number) => {
+    if (!isPlaying) setIsPlaying(true);
+    setPlayerY((prev) => Math.max(0, Math.min(CANVAS_HEIGHT - PADDLE_HEIGHT, prev + dir * 20)));
+  };
+
+  return (
+    <div className="relative bg-background" style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}>
+      <button onClick={onBack} className="absolute top-1 left-1 z-10 p-1 hover:bg-muted rounded">
+        <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+      </button>
+
+      <div className="absolute top-1 left-1/2 -translate-x-1/2 text-xs font-bold">
+        <span className="text-neon-cyan">{score.player}</span>
+        <span className="text-muted-foreground mx-2">-</span>
+        <span className="text-neon-pink">{score.ai}</span>
+      </div>
+
+      {/* Player paddle */}
+      <div className="absolute bg-neon-cyan rounded" style={{ left: 5, top: playerY, width: PADDLE_WIDTH, height: PADDLE_HEIGHT }} />
+      
+      {/* AI paddle */}
+      <div className="absolute bg-neon-pink rounded" style={{ right: 5, top: aiY, width: PADDLE_WIDTH, height: PADDLE_HEIGHT }} />
+      
+      {/* Ball */}
+      <div className="absolute bg-white rounded-full" style={{ left: ball.x, top: ball.y, width: BALL_SIZE, height: BALL_SIZE }} />
+
+      {/* Center line */}
+      <div className="absolute left-1/2 top-0 bottom-0 w-px bg-muted-foreground/30" style={{ borderLeft: '2px dashed' }} />
+
+      {/* Controls */}
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-4">
+        <button onClick={() => movePlayer(-1)} className="p-3 bg-muted rounded hover:bg-muted/80">↑</button>
+        <button onClick={() => movePlayer(1)} className="p-3 bg-muted rounded hover:bg-muted/80">↓</button>
+      </div>
+
+      {!isPlaying && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+          <p className="text-sm font-medium">Use arrows to start!</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============= COLOR MATCH GAME =============
+const COLORS = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181'];
+
+const ColorMatchGame = ({ onBack }: { onBack: () => void }) => {
+  const [targetColor, setTargetColor] = useState(COLORS[0]);
+  const [score, setScore] = useState(0);
+  const [highScore, setHighScore] = useState(() => {
+    const saved = localStorage.getItem('colormatchHighScore');
+    return saved ? parseInt(saved) : 0;
+  });
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+
+  const newTarget = useCallback(() => {
+    setTargetColor(COLORS[Math.floor(Math.random() * COLORS.length)]);
+  }, []);
+
+  useEffect(() => {
+    if (!isPlaying || gameOver) return;
+    
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          setGameOver(true);
+          if (score > highScore) {
+            setHighScore(score);
+            localStorage.setItem('colormatchHighScore', score.toString());
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isPlaying, gameOver, score, highScore]);
+
+  const handleColorClick = (color: string) => {
+    if (!isPlaying) {
+      setIsPlaying(true);
+      newTarget();
+      return;
+    }
+    if (gameOver) return;
+    
+    if (color === targetColor) {
+      setScore((s) => s + 1);
+      newTarget();
+    } else {
+      setScore((s) => Math.max(0, s - 1));
+    }
+  };
+
+  const resetGame = () => {
+    setScore(0);
+    setTimeLeft(30);
+    setIsPlaying(false);
+    setGameOver(false);
+    newTarget();
+  };
+
+  return (
+    <div className="relative bg-background p-3" style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}>
+      <div className="flex items-center justify-between mb-2">
+        <button onClick={onBack} className="p-1 hover:bg-muted rounded">
+          <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+        </button>
+        <span className="text-xs text-neon-yellow">{timeLeft}s | Best: {highScore}</span>
+        <button onClick={resetGame} className="p-1 hover:bg-muted rounded">
+          <RotateCcw className="w-3 h-3 text-muted-foreground" />
+        </button>
+      </div>
+
+      <div className="text-center my-4">
+        <p className="text-xs text-muted-foreground mb-2">Match this color:</p>
+        <div className="w-16 h-16 mx-auto rounded-lg shadow-lg" style={{ backgroundColor: targetColor }} />
+        <p className="text-2xl font-bold text-neon-cyan mt-2">{score}</p>
+      </div>
+
+      <div className="grid grid-cols-5 gap-2 mt-4">
+        {COLORS.map((color, i) => (
+          <motion.button
+            key={i}
+            onClick={() => handleColorClick(color)}
+            className="aspect-square rounded-lg shadow-md"
+            style={{ backgroundColor: color }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          />
+        ))}
+      </div>
+
+      {!isPlaying && !gameOver && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+          <p className="text-sm font-medium">Click any color to start!</p>
+        </div>
+      )}
+
+      {gameOver && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="text-center">
+            <p className="text-sm font-bold text-neon-yellow mb-1">Time's Up!</p>
+            <p className="text-xs">Score: {score}</p>
+            <button onClick={resetGame} className="text-xs text-neon-cyan underline mt-2">Play Again</button>
+          </div>
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
+// ============= MATH QUIZ GAME =============
+const MathQuizGame = ({ onBack }: { onBack: () => void }) => {
+  const [problem, setProblem] = useState({ a: 0, b: 0, op: '+', answer: 0 });
+  const [options, setOptions] = useState<number[]>([]);
+  const [score, setScore] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [highScore, setHighScore] = useState(() => {
+    const saved = localStorage.getItem('mathquizHighScore');
+    return saved ? parseInt(saved) : 0;
+  });
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+
+  const generateProblem = useCallback(() => {
+    const ops = ['+', '-', '×'];
+    const op = ops[Math.floor(Math.random() * ops.length)];
+    let a = Math.floor(Math.random() * 12) + 1;
+    let b = Math.floor(Math.random() * 12) + 1;
+    let answer = 0;
+
+    if (op === '+') answer = a + b;
+    else if (op === '-') {
+      if (a < b) [a, b] = [b, a];
+      answer = a - b;
+    } else answer = a * b;
+
+    const wrongAnswers = new Set<number>();
+    while (wrongAnswers.size < 3) {
+      const wrong = answer + (Math.floor(Math.random() * 10) - 5);
+      if (wrong !== answer && wrong >= 0) wrongAnswers.add(wrong);
+    }
+
+    const allOptions = [answer, ...wrongAnswers].sort(() => Math.random() - 0.5);
+    setProblem({ a, b, op, answer });
+    setOptions(allOptions);
+  }, []);
+
+  useEffect(() => {
+    generateProblem();
+  }, [generateProblem]);
+
+  useEffect(() => {
+    if (!isPlaying || gameOver) return;
+    
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          setGameOver(true);
+          if (score > highScore) {
+            setHighScore(score);
+            localStorage.setItem('mathquizHighScore', score.toString());
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isPlaying, gameOver, score, highScore]);
+
+  const handleAnswer = (answer: number) => {
+    if (!isPlaying) {
+      setIsPlaying(true);
+    }
+    if (gameOver) return;
+
+    if (answer === problem.answer) {
+      setScore((s) => s + 10 + streak * 2);
+      setStreak((s) => s + 1);
+    } else {
+      setStreak(0);
+    }
+    generateProblem();
+  };
+
+  const resetGame = () => {
+    setScore(0);
+    setStreak(0);
+    setTimeLeft(60);
+    setIsPlaying(false);
+    setGameOver(false);
+    generateProblem();
+  };
+
+  return (
+    <div className="relative bg-background p-3" style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}>
+      <div className="flex items-center justify-between mb-2">
+        <button onClick={onBack} className="p-1 hover:bg-muted rounded">
+          <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+        </button>
+        <span className="text-xs text-neon-green">{timeLeft}s | Best: {highScore}</span>
+        <button onClick={resetGame} className="p-1 hover:bg-muted rounded">
+          <RotateCcw className="w-3 h-3 text-muted-foreground" />
+        </button>
+      </div>
+
+      <div className="text-center mt-4">
+        <p className="text-xs text-muted-foreground">Streak: {streak} 🔥</p>
+        <p className="text-3xl font-bold my-4">
+          {problem.a} {problem.op} {problem.b} = ?
+        </p>
+        <p className="text-2xl font-bold text-neon-cyan">{score}</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 mt-6">
+        {options.map((opt, i) => (
+          <motion.button
+            key={i}
+            onClick={() => handleAnswer(opt)}
+            className="py-3 rounded-lg bg-muted hover:bg-muted/80 text-lg font-bold"
+            whileTap={{ scale: 0.95 }}
+          >
+            {opt}
+          </motion.button>
+        ))}
+      </div>
+
+      {!isPlaying && !gameOver && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+          <p className="text-sm font-medium">Click an answer to start!</p>
+        </div>
+      )}
+
+      {gameOver && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="text-center">
+            <p className="text-sm font-bold text-neon-green mb-1">Time's Up!</p>
+            <p className="text-xs">Score: {score}</p>
+            <button onClick={resetGame} className="text-xs text-neon-cyan underline mt-2">Play Again</button>
+          </div>
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
+// ============= WHACK A MOLE GAME =============
+const WhackAMoleGame = ({ onBack }: { onBack: () => void }) => {
+  const [moles, setMoles] = useState<boolean[]>(Array(9).fill(false));
+  const [score, setScore] = useState(0);
+  const [highScore, setHighScore] = useState(() => {
+    const saved = localStorage.getItem('whackamoleHighScore');
+    return saved ? parseInt(saved) : 0;
+  });
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+
+  useEffect(() => {
+    if (!isPlaying || gameOver) return;
+
+    const moleInterval = setInterval(() => {
+      setMoles((prev) => {
+        const newMoles = Array(9).fill(false);
+        const numMoles = Math.min(3, Math.floor(score / 5) + 1);
+        for (let i = 0; i < numMoles; i++) {
+          newMoles[Math.floor(Math.random() * 9)] = true;
+        }
+        return newMoles;
+      });
+    }, 800);
+
+    return () => clearInterval(moleInterval);
+  }, [isPlaying, gameOver, score]);
+
+  useEffect(() => {
+    if (!isPlaying || gameOver) return;
+    
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          setGameOver(true);
+          if (score > highScore) {
+            setHighScore(score);
+            localStorage.setItem('whackamoleHighScore', score.toString());
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isPlaying, gameOver, score, highScore]);
+
+  const whackMole = (index: number) => {
+    if (!isPlaying) {
+      setIsPlaying(true);
+      return;
+    }
+    if (gameOver) return;
+
+    if (moles[index]) {
+      setScore((s) => s + 1);
+      setMoles((prev) => {
+        const newMoles = [...prev];
+        newMoles[index] = false;
+        return newMoles;
+      });
+    }
+  };
+
+  const resetGame = () => {
+    setMoles(Array(9).fill(false));
+    setScore(0);
+    setTimeLeft(30);
+    setIsPlaying(false);
+    setGameOver(false);
+  };
+
+  return (
+    <div className="relative bg-background p-3" style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}>
+      <div className="flex items-center justify-between mb-2">
+        <button onClick={onBack} className="p-1 hover:bg-muted rounded">
+          <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+        </button>
+        <span className="text-xs text-neon-orange">{timeLeft}s | Best: {highScore}</span>
+        <button onClick={resetGame} className="p-1 hover:bg-muted rounded">
+          <RotateCcw className="w-3 h-3 text-muted-foreground" />
+        </button>
+      </div>
+
+      <p className="text-center text-2xl font-bold text-neon-cyan mb-4">{score}</p>
+
+      <div className="grid grid-cols-3 gap-2 mx-auto" style={{ width: 160 }}>
+        {moles.map((isMole, i) => (
+          <motion.button
+            key={i}
+            onClick={() => whackMole(i)}
+            className={`aspect-square rounded-lg flex items-center justify-center text-2xl transition-colors ${
+              isMole ? 'bg-neon-orange' : 'bg-muted hover:bg-muted/80'
+            }`}
+            whileTap={{ scale: 0.9 }}
+          >
+            {isMole && '🐹'}
+          </motion.button>
+        ))}
+      </div>
+
+      {!isPlaying && !gameOver && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+          <p className="text-sm font-medium">Click any hole to start!</p>
+        </div>
+      )}
+
+      {gameOver && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="text-center">
+            <p className="text-sm font-bold text-neon-orange mb-1">Time's Up!</p>
+            <p className="text-xs">Score: {score}</p>
+            <button onClick={resetGame} className="text-xs text-neon-cyan underline mt-2">Play Again</button>
+          </div>
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
+// ============= BRICK BREAKER GAME =============
+const BrickBreakerGame = ({ onBack }: { onBack: () => void }) => {
+  const [paddleX, setPaddleX] = useState(75);
+  const [ball, setBall] = useState({ x: 100, y: 200, vx: 2, vy: -2 });
+  const [bricks, setBricks] = useState<boolean[][]>([]);
+  const [score, setScore] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+  const [won, setWon] = useState(false);
+  const gameLoopRef = useRef<number>();
+
+  const PADDLE_WIDTH = 50;
+  const PADDLE_HEIGHT = 8;
+  const BALL_SIZE = 6;
+  const BRICK_ROWS = 4;
+  const BRICK_COLS = 5;
+  const BRICK_WIDTH = 36;
+  const BRICK_HEIGHT = 12;
+
+  const initBricks = useCallback(() => {
+    const newBricks = Array(BRICK_ROWS).fill(null).map(() => Array(BRICK_COLS).fill(true));
+    setBricks(newBricks);
+  }, []);
+
+  useEffect(() => {
+    initBricks();
+  }, [initBricks]);
+
+  useEffect(() => {
+    if (!isPlaying || gameOver || won) return;
+
+    const gameLoop = () => {
+      setBall((prev) => {
+        let { x, y, vx, vy } = prev;
+        x += vx;
+        y += vy;
+
+        // Wall bounces
+        if (x <= 0 || x >= CANVAS_WIDTH - BALL_SIZE) vx = -vx;
+        if (y <= 30) vy = -vy;
+
+        // Paddle collision
+        if (y >= CANVAS_HEIGHT - 30 && y <= CANVAS_HEIGHT - 20 && x >= paddleX && x <= paddleX + PADDLE_WIDTH) {
+          vy = -Math.abs(vy);
+          vx += (x - paddleX - PADDLE_WIDTH / 2) * 0.1;
+        }
+
+        // Game over
+        if (y >= CANVAS_HEIGHT) {
+          setGameOver(true);
+          return prev;
+        }
+
+        // Brick collision
+        setBricks((prevBricks) => {
+          const newBricks = prevBricks.map((row) => [...row]);
+          let hitBrick = false;
+
+          for (let r = 0; r < BRICK_ROWS; r++) {
+            for (let c = 0; c < BRICK_COLS; c++) {
+              if (newBricks[r][c]) {
+                const brickX = c * (BRICK_WIDTH + 4) + 8;
+                const brickY = r * (BRICK_HEIGHT + 4) + 40;
+
+                if (x >= brickX && x <= brickX + BRICK_WIDTH && y >= brickY && y <= brickY + BRICK_HEIGHT) {
+                  newBricks[r][c] = false;
+                  hitBrick = true;
+                  setScore((s) => s + 10);
+                }
+              }
+            }
+          }
+
+          if (hitBrick) vy = -vy;
+
+          // Check win
+          if (newBricks.every((row) => row.every((b) => !b))) {
+            setWon(true);
+          }
+
+          return newBricks;
+        });
+
+        return { x, y, vx: Math.max(-4, Math.min(4, vx)), vy };
+      });
+
+      gameLoopRef.current = requestAnimationFrame(gameLoop);
+    };
+
+    gameLoopRef.current = requestAnimationFrame(gameLoop);
+    return () => { if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current); };
+  }, [isPlaying, gameOver, won, paddleX]);
+
+  const movePaddle = (dir: number) => {
+    if (!isPlaying) setIsPlaying(true);
+    setPaddleX((prev) => Math.max(0, Math.min(CANVAS_WIDTH - PADDLE_WIDTH, prev + dir * 20)));
+  };
+
+  const resetGame = () => {
+    setPaddleX(75);
+    setBall({ x: 100, y: 200, vx: 2, vy: -2 });
+    initBricks();
+    setScore(0);
+    setIsPlaying(false);
+    setGameOver(false);
+    setWon(false);
+  };
+
+  return (
+    <div className="relative bg-background" style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}>
+      <button onClick={onBack} className="absolute top-1 left-1 z-10 p-1 hover:bg-muted rounded">
+        <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+      </button>
+      <button onClick={resetGame} className="absolute top-1 right-6 z-10 p-1 hover:bg-muted rounded">
+        <RotateCcw className="w-3 h-3 text-muted-foreground" />
+      </button>
+
+      <div className="absolute top-1 left-1/2 -translate-x-1/2 text-xs font-bold text-neon-purple">{score}</div>
+
+      {/* Bricks */}
+      {bricks.map((row, r) =>
+        row.map((brick, c) =>
+          brick && (
+            <div
+              key={`${r}-${c}`}
+              className="absolute rounded-sm"
+              style={{
+                left: c * (BRICK_WIDTH + 4) + 8,
+                top: r * (BRICK_HEIGHT + 4) + 40,
+                width: BRICK_WIDTH,
+                height: BRICK_HEIGHT,
+                backgroundColor: ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3'][r],
+              }}
+            />
+          )
+        )
+      )}
+
+      {/* Ball */}
+      <div className="absolute bg-white rounded-full" style={{ left: ball.x, top: ball.y, width: BALL_SIZE, height: BALL_SIZE }} />
+
+      {/* Paddle */}
+      <div className="absolute bg-neon-cyan rounded" style={{ left: paddleX, bottom: 20, width: PADDLE_WIDTH, height: PADDLE_HEIGHT }} />
+
+      {/* Controls */}
+      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-4">
+        <button onClick={() => movePaddle(-1)} className="p-2 bg-muted rounded hover:bg-muted/80">←</button>
+        <button onClick={() => movePaddle(1)} className="p-2 bg-muted rounded hover:bg-muted/80">→</button>
+      </div>
+
+      {!isPlaying && !gameOver && !won && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+          <p className="text-sm font-medium">Use arrows to start!</p>
+        </div>
+      )}
+
+      {(gameOver || won) && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="text-center">
+            <p className="text-sm font-bold mb-1">{won ? '🎉 You Won!' : '😢 Game Over!'}</p>
+            <p className="text-xs">Score: {score}</p>
+            <button onClick={resetGame} className="text-xs text-neon-cyan underline mt-2">Play Again</button>
+          </div>
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
 // ============= MAIN COMPONENT =============
 const FloatingGame = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -495,7 +1292,29 @@ const FloatingGame = () => {
     { id: 'snake' as GameType, name: 'Snake', icon: Grid3X3, color: 'text-neon-green' },
     { id: 'memory' as GameType, name: 'Memory', icon: Grid3X3, color: 'text-neon-purple' },
     { id: 'reaction' as GameType, name: 'Reaction', icon: Zap, color: 'text-neon-cyan' },
+    { id: 'tictactoe' as GameType, name: 'Tic-Tac-Toe', icon: Hash, color: 'text-neon-pink' },
+    { id: 'pong' as GameType, name: 'Pong', icon: Circle, color: 'text-neon-yellow' },
+    { id: 'colormatch' as GameType, name: 'Color Match', icon: Palette, color: 'text-neon-orange' },
+    { id: 'mathquiz' as GameType, name: 'Math Quiz', icon: Calculator, color: 'text-neon-green' },
+    { id: 'whackamole' as GameType, name: 'Whack-a-Mole', icon: MousePointer, color: 'text-neon-cyan' },
+    { id: 'brickbreaker' as GameType, name: 'Brick Breaker', icon: Square, color: 'text-neon-purple' },
   ];
+
+  const renderGame = () => {
+    switch (currentGame) {
+      case 'flappy': return <FlappyGame onBack={() => setCurrentGame('menu')} />;
+      case 'snake': return <SnakeGame onBack={() => setCurrentGame('menu')} />;
+      case 'memory': return <MemoryGame onBack={() => setCurrentGame('menu')} />;
+      case 'reaction': return <ReactionGame onBack={() => setCurrentGame('menu')} />;
+      case 'tictactoe': return <TicTacToeGame onBack={() => setCurrentGame('menu')} />;
+      case 'pong': return <PongGame onBack={() => setCurrentGame('menu')} />;
+      case 'colormatch': return <ColorMatchGame onBack={() => setCurrentGame('menu')} />;
+      case 'mathquiz': return <MathQuizGame onBack={() => setCurrentGame('menu')} />;
+      case 'whackamole': return <WhackAMoleGame onBack={() => setCurrentGame('menu')} />;
+      case 'brickbreaker': return <BrickBreakerGame onBack={() => setCurrentGame('menu')} />;
+      default: return null;
+    }
+  };
 
   return (
     <>
@@ -530,29 +1349,21 @@ const FloatingGame = () => {
             </div>
 
             {currentGame === 'menu' ? (
-              <div className="p-3 grid grid-cols-2 gap-2" style={{ width: CANVAS_WIDTH }}>
+              <div className="p-3 grid grid-cols-2 gap-2 max-h-[320px] overflow-y-auto" style={{ width: CANVAS_WIDTH }}>
                 {games.map((game) => (
                   <motion.button
                     key={game.id}
                     onClick={() => setCurrentGame(game.id)}
-                    className="flex flex-col items-center gap-2 p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                    className="flex flex-col items-center gap-1 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <game.icon className={`w-6 h-6 ${game.color}`} />
-                    <span className="text-xs">{game.name}</span>
+                    <game.icon className={`w-5 h-5 ${game.color}`} />
+                    <span className="text-[10px]">{game.name}</span>
                   </motion.button>
                 ))}
               </div>
-            ) : currentGame === 'flappy' ? (
-              <FlappyGame onBack={() => setCurrentGame('menu')} />
-            ) : currentGame === 'snake' ? (
-              <SnakeGame onBack={() => setCurrentGame('menu')} />
-            ) : currentGame === 'memory' ? (
-              <MemoryGame onBack={() => setCurrentGame('menu')} />
-            ) : (
-              <ReactionGame onBack={() => setCurrentGame('menu')} />
-            )}
+            ) : renderGame()}
           </motion.div>
         )}
       </AnimatePresence>

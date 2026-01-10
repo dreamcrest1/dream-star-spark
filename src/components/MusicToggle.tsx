@@ -1,12 +1,15 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Volume2, VolumeX, Volume1, 
   Play, Pause, SkipBack, SkipForward, 
   X, Music, Shuffle, Repeat, 
-  ChevronDown, Heart, Radio
+  ChevronDown, Heart, Radio, Sparkles, Waves, Circle, Box
 } from 'lucide-react';
 import { Howl, Howler } from 'howler';
+
+// Lazy load 3D visualizer for performance
+const Visualizer3D = lazy(() => import('./Visualizer3D'));
 
 // Curated playlist - Track 1 uses your uploaded file
 // Add more MP3 files to public/audio/ for variety
@@ -243,7 +246,7 @@ const MusicToggle = () => {
   const [repeatMode, setRepeatMode] = useState<'none' | 'all' | 'one'>('none');
   const [likedTracks, setLikedTracks] = useState<number[]>([]);
   const [showPlaylist, setShowPlaylist] = useState(false);
-  const [visualizerMode, setVisualizerMode] = useState<'bars' | 'circular'>('bars');
+  const [visualizerMode, setVisualizerMode] = useState<'bars' | 'circular' | 'waveform3d' | 'particles' | 'kaleidoscope' | 'rings'>('bars');
   
   const soundRef = useRef<Howl | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -518,15 +521,58 @@ const MusicToggle = () => {
           >
             {/* Header */}
             <div className="relative p-4 pb-2">
-              <div className="absolute top-3 right-3 flex items-center gap-2">
-                <motion.button
-                  onClick={() => setVisualizerMode(prev => prev === 'bars' ? 'circular' : 'bars')}
-                  className="p-1.5 rounded-full bg-muted/50 hover:bg-muted transition-colors"
-                  whileTap={{ scale: 0.9 }}
-                  title="Toggle Visualizer"
-                >
-                  <Radio className="w-3.5 h-3.5 text-neon-cyan" />
-                </motion.button>
+              <div className="absolute top-3 right-3 flex items-center gap-1">
+                {/* Visualizer Mode Selector */}
+                <div className="flex items-center gap-0.5 bg-muted/30 rounded-full p-0.5 mr-1">
+                  <motion.button
+                    onClick={() => setVisualizerMode('bars')}
+                    className={`p-1 rounded-full transition-colors ${visualizerMode === 'bars' ? 'bg-neon-purple/30 text-neon-purple' : 'text-muted-foreground hover:text-foreground'}`}
+                    whileTap={{ scale: 0.9 }}
+                    title="Bar Visualizer"
+                  >
+                    <Waves className="w-3 h-3" />
+                  </motion.button>
+                  <motion.button
+                    onClick={() => setVisualizerMode('circular')}
+                    className={`p-1 rounded-full transition-colors ${visualizerMode === 'circular' ? 'bg-neon-cyan/30 text-neon-cyan' : 'text-muted-foreground hover:text-foreground'}`}
+                    whileTap={{ scale: 0.9 }}
+                    title="Circular Visualizer"
+                  >
+                    <Circle className="w-3 h-3" />
+                  </motion.button>
+                  <motion.button
+                    onClick={() => setVisualizerMode('particles')}
+                    className={`p-1 rounded-full transition-colors ${visualizerMode === 'particles' ? 'bg-neon-pink/30 text-neon-pink' : 'text-muted-foreground hover:text-foreground'}`}
+                    whileTap={{ scale: 0.9 }}
+                    title="3D Particles"
+                  >
+                    <Sparkles className="w-3 h-3" />
+                  </motion.button>
+                  <motion.button
+                    onClick={() => setVisualizerMode('waveform3d')}
+                    className={`p-1 rounded-full transition-colors ${visualizerMode === 'waveform3d' ? 'bg-neon-green/30 text-neon-green' : 'text-muted-foreground hover:text-foreground'}`}
+                    whileTap={{ scale: 0.9 }}
+                    title="3D Waveform"
+                  >
+                    <Radio className="w-3 h-3" />
+                  </motion.button>
+                  <motion.button
+                    onClick={() => setVisualizerMode('kaleidoscope')}
+                    className={`p-1 rounded-full transition-colors ${visualizerMode === 'kaleidoscope' ? 'bg-neon-yellow/30 text-neon-yellow' : 'text-muted-foreground hover:text-foreground'}`}
+                    whileTap={{ scale: 0.9 }}
+                    title="Kaleidoscope"
+                  >
+                    <Box className="w-3 h-3" />
+                  </motion.button>
+                  <motion.button
+                    onClick={() => setVisualizerMode('rings')}
+                    className={`p-1 rounded-full transition-colors ${visualizerMode === 'rings' ? 'bg-neon-orange/30 text-neon-orange' : 'text-muted-foreground hover:text-foreground'}`}
+                    whileTap={{ scale: 0.9 }}
+                    title="3D Rings"
+                  >
+                    <Circle className="w-3 h-3" />
+                  </motion.button>
+                </div>
                 <button
                   onClick={() => setIsOpen(false)}
                   className="p-1.5 rounded-full bg-muted/50 hover:bg-muted transition-colors"
@@ -586,10 +632,35 @@ const MusicToggle = () => {
               </div>
             </div>
 
-            {/* Bar Visualizer */}
+            {/* 2D Visualizers */}
             {visualizerMode === 'bars' && (
               <div className="px-2 py-2 border-y border-muted/20">
                 <AudioVisualizer analyserRef={analyserRef} isPlaying={isPlaying} />
+              </div>
+            )}
+
+            {/* 3D Visualizers */}
+            {(visualizerMode === 'waveform3d' || visualizerMode === 'particles' || visualizerMode === 'kaleidoscope' || visualizerMode === 'rings') && (
+              <div className="px-2 py-2 border-y border-muted/20">
+                <Suspense fallback={
+                  <div className="w-full h-24 flex items-center justify-center bg-gradient-to-b from-background/50 to-muted/30 rounded-lg">
+                    <div className="flex gap-1">
+                      {[0, 0.1, 0.2, 0.3, 0.4].map((delay, i) => (
+                        <div
+                          key={i}
+                          className="w-1 bg-neon-purple rounded-full animate-pulse"
+                          style={{ height: 16 + i * 4, animationDelay: `${delay}s` }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                }>
+                  <Visualizer3D 
+                    analyserRef={analyserRef} 
+                    isPlaying={isPlaying} 
+                    mode={visualizerMode as 'waveform3d' | 'particles' | 'kaleidoscope' | 'rings'} 
+                  />
+                </Suspense>
               </div>
             )}
 

@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, X } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { products, type Product } from '@/data/products';
 import ProductCard from '@/components/ProductCard';
 import Navbar from '@/components/Navbar';
@@ -17,11 +18,39 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+// Category mapping from URL slugs to actual category names
+const categoryMap: Record<string, string> = {
+  'ai-tools': 'AI Tools',
+  'video-editing': 'Video Editing',
+  'office': 'Office Essentials',
+  'lead-gen': 'Lead Generation',
+  'digital-assets': 'Cloud Services',
+  'indian-ott': 'Indian OTT',
+  'international-ott': 'International OTT',
+  'software': 'Software',
+  'writing-tools': 'Writing Tools',
+  'seo': 'SEO',
+};
+
 const Products = () => {
+  const [searchParams] = useSearchParams();
+  const categoryFromUrl = searchParams.get('category');
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('name');
   const [showFilters, setShowFilters] = useState(false);
+
+  // Set category from URL on mount
+  useEffect(() => {
+    if (categoryFromUrl) {
+      const mappedCategory = categoryMap[categoryFromUrl];
+      if (mappedCategory) {
+        setSelectedCategory(mappedCategory);
+      }
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [categoryFromUrl]);
 
   // Get unique categories
   const categories = useMemo(() => {

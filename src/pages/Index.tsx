@@ -10,9 +10,6 @@ import FeaturedProducts from '@/components/FeaturedProducts';
 import BlogSection from '@/components/BlogSection';
 import About from '@/components/About';
 import Footer from '@/components/Footer';
-import StickmanMascot from '@/components/StickmanMascot';
-import MusicToggle from '@/components/MusicToggle';
-import WhatsAppButton from '@/components/WhatsAppButton';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -38,10 +35,6 @@ const Index = () => {
             </main>
             <Footer />
           </div>
-
-          <StickmanMascot />
-          <MusicToggle />
-          <WhatsAppButton />
         </div>
       )}
     </>

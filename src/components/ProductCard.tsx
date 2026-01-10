@@ -1,17 +1,16 @@
 import { motion } from 'framer-motion';
 import { ExternalLink, Sparkles } from 'lucide-react';
+import { type Product } from '@/data/products';
 
 interface ProductCardProps {
-  name: string;
-  image: string;
-  originalPrice: number;
-  salePrice: number;
-  discount: number;
-  buyLink: string;
-  index: number;
+  product: Product;
+  index?: number;
 }
 
-const ProductCard = ({ name, image, originalPrice, salePrice, discount, buyLink, index }: ProductCardProps) => {
+const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
+  const { name, image, regularPrice, salePrice, externalUrl } = product;
+  const displayPrice = salePrice ?? regularPrice;
+  const discount = salePrice ? Math.round(((regularPrice - salePrice) / regularPrice) * 100) : 0;
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -53,7 +52,7 @@ const ProductCard = ({ name, image, originalPrice, salePrice, discount, buyLink,
             className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center"
           >
             <a
-              href={buyLink}
+              href={externalUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-3 bg-gradient-to-r from-neon-pink to-neon-purple rounded-xl font-display font-bold uppercase text-sm flex items-center gap-2 hover:scale-105 transition-transform"
@@ -73,11 +72,11 @@ const ProductCard = ({ name, image, originalPrice, salePrice, discount, buyLink,
           <div className="flex items-center justify-between">
             <div className="flex items-baseline gap-2">
               <span className="font-display font-bold text-lg text-neon-pink">
-                ₹{salePrice.toLocaleString()}
+                ₹{displayPrice.toLocaleString()}
               </span>
-              {originalPrice > salePrice && (
+              {salePrice && regularPrice > salePrice && (
                 <span className="text-sm text-muted-foreground line-through">
-                  ₹{originalPrice.toLocaleString()}
+                  ₹{regularPrice.toLocaleString()}
                 </span>
               )}
             </div>

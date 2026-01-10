@@ -2,74 +2,17 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
+import { products } from '@/data/products';
 
-// Sample featured products (to be replaced with CSV data later)
-const featuredProducts = [
-  {
-    name: 'Runway ML (Unlimited Plan)',
-    image: 'https://dreamstarsolution.com/wp-content/uploads/2025/04/Website-Poster-7-1-1-300x300.jpg',
-    originalPrice: 8000,
-    salePrice: 1600,
-    discount: 80,
-    buyLink: 'https://cosmofeed.com/vp/642a0b95713227002add768b',
-  },
-  {
-    name: 'ChatGPT Plus Monthly',
-    image: 'https://dreamstarsolution.com/wp-content/uploads/2025/04/Website-Poster-4-1-1-300x300.jpg',
-    originalPrice: 2000,
-    salePrice: 399,
-    discount: 80,
-    buyLink: 'https://cosmofeed.com/vp/642a0b95713227002add768b',
-  },
-  {
-    name: 'Spotify Premium (12 Months)',
-    image: 'https://dreamstarsolution.com/wp-content/uploads/2025/04/Website-Poster-5-1-1-300x300.jpg',
-    originalPrice: 2000,
-    salePrice: 850,
-    discount: 58,
-    buyLink: 'https://cosmofeed.com/vp/642a0b95713227002add768b',
-  },
-  {
-    name: 'Amazon Prime Yearly',
-    image: 'https://dreamstarsolution.com/wp-content/uploads/2025/04/Website-Poster-2-1-1-300x300.jpg',
-    originalPrice: 1499,
-    salePrice: 1150,
-    discount: 23,
-    buyLink: 'https://cosmofeed.com/vp/642a0b95713227002add768b',
-  },
-  {
-    name: 'Loom Business+AI Yearly',
-    image: 'https://dreamstarsolution.com/wp-content/uploads/2025/04/Website-Poster-6-1-1-300x300.jpg',
-    originalPrice: 8000,
-    salePrice: 3500,
-    discount: 56,
-    buyLink: 'https://cosmofeed.com/vp/642a0b95713227002add768b',
-  },
-  {
-    name: 'Prime Video Yearly (5 Devices)',
-    image: 'https://dreamstarsolution.com/wp-content/uploads/2025/04/Website-Poster-3-1-1-300x300.jpg',
-    originalPrice: 1500,
-    salePrice: 649,
-    discount: 57,
-    buyLink: 'https://cosmofeed.com/vp/642a0b95713227002add768b',
-  },
-  {
-    name: 'Perplexity AI Pro Monthly',
-    image: 'https://dreamstarsolution.com/wp-content/uploads/2025/04/4.jpg',
-    originalPrice: 1800,
-    salePrice: 499,
-    discount: 72,
-    buyLink: 'https://cosmofeed.com/vp/642a0b95713227002add768b',
-  },
-  {
-    name: 'Netflix Premium (1 Month)',
-    image: 'https://dreamstarsolution.com/wp-content/uploads/2025/04/7.jpg',
-    originalPrice: 649,
-    salePrice: 199,
-    discount: 69,
-    buyLink: 'https://cosmofeed.com/vp/642a0b95713227002add768b',
-  },
-];
+// Get top 8 products with discounts
+const featuredProducts = products
+  .filter(p => p.salePrice !== null)
+  .sort((a, b) => {
+    const discountA = a.salePrice ? ((a.regularPrice - a.salePrice) / a.regularPrice) * 100 : 0;
+    const discountB = b.salePrice ? ((b.regularPrice - b.salePrice) / b.regularPrice) * 100 : 0;
+    return discountB - discountA;
+  })
+  .slice(0, 8);
 
 const FeaturedProducts = () => {
   return (
@@ -116,7 +59,7 @@ const FeaturedProducts = () => {
         {/* Products Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {featuredProducts.map((product, index) => (
-            <ProductCard key={product.name} {...product} index={index} />
+            <ProductCard key={product.id} product={product} index={index} />
           ))}
         </div>
 

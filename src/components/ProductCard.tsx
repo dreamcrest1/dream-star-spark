@@ -73,17 +73,17 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
 
         {/* Content */}
         <div className="p-4">
-          <h3 className="font-display font-semibold text-sm md:text-base line-clamp-2 mb-3 group-hover:text-neon-cyan transition-colors">
+          <h3 className="font-accent text-sm md:text-base line-clamp-2 mb-3 group-hover:text-neon-cyan transition-colors tracking-wide">
             {name}
           </h3>
 
           <div className="flex items-center justify-between">
             <div className="flex items-baseline gap-2">
-              <span className="font-display font-bold text-lg text-neon-pink">
+              <span className="font-accent text-lg text-neon-pink tracking-wider">
                 ₹{displayPrice.toLocaleString()}
               </span>
               {salePrice && regularPrice > salePrice && (
-                <span className="text-sm text-muted-foreground line-through">
+                <span className="text-xs font-body text-muted-foreground line-through">
                   ₹{regularPrice.toLocaleString()}
                 </span>
               )}

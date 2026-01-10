@@ -15,7 +15,8 @@ export default {
     extend: {
       fontFamily: {
         display: ['Orbitron', 'sans-serif'],
-        body: ['Rajdhani', 'sans-serif'],
+        body: ['Exo 2', 'Rajdhani', 'sans-serif'],
+        accent: ['Audiowide', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

@@ -26,7 +26,7 @@ export const blogs: Blog[] = [
 
 **Our Solution:**
 At Dreamstar Solution, we offer Netflix code solutions that help you manage these travel codes instantly through our proprietary platform at code.dreamstarsolution.com.`,
-    image: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=800",
+    image: "https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=800&q=80",
     category: "Streaming",
     author: "Dreamstar Team",
     date: "2026-01-05",
@@ -47,7 +47,7 @@ At Dreamstar Solution, we offer Netflix code solutions that help you manage thes
 
 **Why Choose Movie Box Pro?**
 Instead of juggling multiple subscriptions, Movie Box Pro offers a unified interface at a fraction of the cost.`,
-    image: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=800",
+    image: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=800&q=80",
     category: "Apps",
     author: "Dreamstar Team",
     date: "2026-01-03",
@@ -72,7 +72,7 @@ OTT refers to content providers that deliver streaming media over the internet, 
 
 **How Dreamstar Helps:**
 We provide premium OTT subscriptions at up to 80% off the original price, making entertainment accessible to everyone.`,
-    image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800",
+    image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=800&q=80",
     category: "Guides",
     author: "Dreamstar Team",
     date: "2025-12-28",
@@ -96,7 +96,7 @@ DreamTools.in is our modern panel built with React.js, offering seamless access 
 - Save up to 90% on premium tools
 - Access multiple tools with one subscription
 - Regular updates and new tool additions`,
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
     category: "Tools",
     author: "Dreamstar Team",
     date: "2025-12-20",
@@ -125,7 +125,7 @@ DreamTools.in is our modern panel built with React.js, offering seamless access 
 - Dreamstar Solution (OTT Services)
 - Dreamcrest Solutions (Cloud Services)
 - DreamTools.in (Group Buy Tools)`,
-    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800",
+    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&q=80",
     category: "Company",
     author: "Dreamstar Team",
     date: "2025-12-15",

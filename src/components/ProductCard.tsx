@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { ExternalLink, Sparkles } from 'lucide-react';
+import { ExternalLink, Sparkles, Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { type Product } from '@/data/products';
 
 interface ProductCardProps {
@@ -8,7 +9,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
-  const { name, image, regularPrice, salePrice, externalUrl } = product;
+  const { id, name, image, regularPrice, salePrice, externalUrl } = product;
   const displayPrice = salePrice ?? regularPrice;
   const discount = salePrice ? Math.round(((regularPrice - salePrice) / regularPrice) * 100) : 0;
   return (
@@ -45,17 +46,24 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
           {/* Scanlines */}
           <div className="absolute inset-0 scanlines opacity-30" />
 
-          {/* Quick Buy Overlay */}
+          {/* Quick Actions Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             whileHover={{ opacity: 1 }}
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center"
+            className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center gap-3"
           >
+            <Link
+              to={`/product/${id}`}
+              className="px-4 py-2 bg-neon-cyan/20 border border-neon-cyan rounded-xl font-display font-bold uppercase text-xs flex items-center gap-2 hover:bg-neon-cyan/30 transition-colors text-neon-cyan"
+            >
+              <Eye className="w-4 h-4" />
+              View
+            </Link>
             <a
               href={externalUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3 bg-gradient-to-r from-neon-pink to-neon-purple rounded-xl font-display font-bold uppercase text-sm flex items-center gap-2 hover:scale-105 transition-transform"
+              className="px-4 py-2 bg-gradient-to-r from-neon-pink to-neon-purple rounded-xl font-display font-bold uppercase text-xs flex items-center gap-2 hover:scale-105 transition-transform text-white"
             >
               Buy Now
               <ExternalLink className="w-4 h-4" />

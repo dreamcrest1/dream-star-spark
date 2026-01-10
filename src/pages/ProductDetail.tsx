@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ExternalLink, Shield, Clock, Zap, Star, CheckCircle } from 'lucide-react';
 import { products } from '@/data/products';
@@ -12,6 +13,11 @@ import ProductCard from '@/components/ProductCard';
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const product = products.find(p => p.id === Number(id));
+
+  // Scroll to top when component mounts or id changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [id]);
 
   if (!product) {
     return (

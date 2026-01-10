@@ -15,7 +15,6 @@ const Footer = () => {
   const supportLinks = [
     { name: 'Contact Us', href: '/contact' },
     { name: 'Terms & Conditions', href: '/terms' },
-    { name: 'Refund Policy', href: '/terms' },
   ];
 
   return (
@@ -42,7 +41,7 @@ const Footer = () => {
             </p>
             <div className="flex gap-4">
               <motion.a
-                href={social.instagram}
+                href="https://www.instagram.com/dreamstarsolution"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.1, y: -2 }}
@@ -51,7 +50,7 @@ const Footer = () => {
                 <Instagram className="w-5 h-5 text-white" />
               </motion.a>
               <motion.a
-                href={`https://wa.me/${contact.whatsapp}`}
+                href="https://wa.me/919991483279"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.1, y: -2 }}
@@ -62,7 +61,7 @@ const Footer = () => {
                 </svg>
               </motion.a>
               <motion.a
-                href={social.youtube}
+                href="https://www.youtube.com/@DreamstarSolution"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.1, y: -2 }}

@@ -10,6 +10,7 @@ import About from '@/components/About';
 import Footer from '@/components/Footer';
 import Mascot from '@/components/Mascot';
 import MusicToggle from '@/components/MusicToggle';
+import WhatsAppButton from '@/components/WhatsAppButton';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -20,11 +21,9 @@ const Index = () => {
       
       {!isLoading && (
         <div className="relative min-h-screen">
-          {/* Background Effects */}
           <InteractiveBackground />
           <CursorTrail />
 
-          {/* Main Content */}
           <div className="relative z-10">
             <Navbar />
             <main>
@@ -36,9 +35,9 @@ const Index = () => {
             <Footer />
           </div>
 
-          {/* Floating Elements */}
           <Mascot />
           <MusicToggle />
+          <WhatsAppButton />
         </div>
       )}
     </>

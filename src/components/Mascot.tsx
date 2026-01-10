@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, RefreshCw } from 'lucide-react';
-import mascotImage from '@/assets/mascot.png';
+import mascotImage from '@/assets/mascot-chibi.png';
 
 interface Fact {
   text: string;
@@ -12,15 +12,15 @@ const facts: Fact[] = [
   { text: "The first computer virus was created in 1983 and was called 'Elk Cloner'!", type: 'trivia' },
   { text: "Why do programmers prefer dark mode? Because light attracts bugs! 🐛", type: 'joke' },
   { text: "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt", type: 'quote' },
-  { text: "The average person spends 6 months of their lifetime waiting for red lights to turn green!", type: 'trivia' },
+  { text: "The average person spends 6 months of their lifetime waiting for red lights!", type: 'trivia' },
   { text: "Why did the AI go to therapy? It had too many unresolved issues! 🤖", type: 'joke' },
-  { text: "Honey never spoils. Archaeologists found 3000-year-old honey in Egyptian tombs that was still edible!", type: 'trivia' },
+  { text: "Honey never spoils. 3000-year-old honey in Egyptian tombs was still edible!", type: 'trivia' },
   { text: "Innovation distinguishes between a leader and a follower. - Steve Jobs", type: 'quote' },
   { text: "The first email was sent in 1971 by Ray Tomlinson to himself!", type: 'trivia' },
   { text: "Why do Java developers wear glasses? Because they can't C#! 😎", type: 'joke' },
   { text: "Octopuses have three hearts and blue blood!", type: 'trivia' },
   { text: "Stay hungry, stay foolish. - Steve Jobs", type: 'quote' },
-  { text: "Why did the developer quit his job? Because he didn't get arrays (a raise)! 💰", type: 'joke' },
+  { text: "Netflix uses 15% of the world's internet bandwidth!", type: 'trivia' },
 ];
 
 const Mascot = () => {
@@ -47,21 +47,18 @@ const Mascot = () => {
           setIsTyping(false);
           clearInterval(timer);
         }
-      }, 30);
-
+      }, 25);
       return () => clearInterval(timer);
     }
   }, [isTyping, currentFact]);
 
   useEffect(() => {
-    // Show greeting after a delay
     const timer = setTimeout(() => {
       if (!isOpen) {
         setIsOpen(true);
         getRandomFact();
       }
-    }, 3000);
-
+    }, 4000);
     return () => clearTimeout(timer);
   }, [getRandomFact, isOpen]);
 
@@ -85,123 +82,93 @@ const Mascot = () => {
 
   return (
     <div className="fixed bottom-6 left-6 z-50">
-      {/* Speech Bubble */}
       <AnimatePresence>
         {isOpen && currentFact && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            className="absolute bottom-28 left-0 w-72 md:w-80 glass-card rounded-2xl p-4 border border-neon-pink/30"
+            className="absolute bottom-32 left-0 w-72 md:w-80 glass-card rounded-2xl p-4 border border-neon-pink/30"
           >
-            {/* Header */}
             <div className="flex items-center justify-between mb-2">
               <span className={`text-xs font-display ${getTypeColor(currentFact.type)}`}>
                 {getTypeLabel(currentFact.type)}
               </span>
               <div className="flex gap-1">
-                <button
-                  onClick={getRandomFact}
-                  className="p-1 hover:bg-muted rounded-full transition-colors"
-                >
+                <button onClick={getRandomFact} className="p-1 hover:bg-muted rounded-full transition-colors">
                   <RefreshCw className="w-4 h-4 text-muted-foreground hover:text-neon-cyan" />
                 </button>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-1 hover:bg-muted rounded-full transition-colors"
-                >
+                <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-muted rounded-full transition-colors">
                   <X className="w-4 h-4 text-muted-foreground hover:text-neon-pink" />
                 </button>
               </div>
             </div>
-
-            {/* Content */}
             <p className="text-sm font-body leading-relaxed">
               {displayedText}
-              {isTyping && (
-                <motion.span
-                  animate={{ opacity: [1, 0] }}
-                  transition={{ duration: 0.5, repeat: Infinity }}
-                  className="text-neon-pink"
-                >
-                  |
-                </motion.span>
-              )}
+              {isTyping && <motion.span animate={{ opacity: [1, 0] }} transition={{ duration: 0.5, repeat: Infinity }} className="text-neon-pink">|</motion.span>}
             </p>
-
-            {/* Tail */}
-            <div className="absolute -bottom-2 left-8 w-4 h-4 glass-card border-r border-b border-neon-pink/30 transform rotate-45" />
+            <div className="absolute -bottom-2 left-12 w-4 h-4 glass-card border-r border-b border-neon-pink/30 transform rotate-45" />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Mascot */}
       <motion.button
-        onClick={() => {
-          setIsOpen(!isOpen);
-          if (!isOpen) getRandomFact();
-        }}
+        onClick={() => { setIsOpen(!isOpen); if (!isOpen) getRandomFact(); }}
         className="relative group"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        animate={{
-          y: [0, -5, 0],
-        }}
-        transition={{
-          y: {
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-          },
-        }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
       >
-        {/* Glow Effect */}
+        {/* Breathing glow */}
         <motion.div
-          className="absolute inset-0 rounded-full bg-neon-pink/30 blur-xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-          }}
+          className="absolute inset-0 rounded-full bg-gradient-to-r from-neon-pink/40 to-neon-cyan/40 blur-xl"
+          animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.7, 0.4] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         />
-
-        {/* Mascot Image */}
-        <img
+        
+        {/* Mascot with idle animation */}
+        <motion.img
           src={mascotImage}
-          alt="Cyber Mascot"
-          className="w-24 h-24 object-contain relative z-10 drop-shadow-[0_0_15px_rgba(255,51,153,0.5)]"
-        />
-
-        {/* Sparkle Effect */}
-        <motion.div
-          className="absolute -top-2 -right-2"
+          alt="Dreamstar Mascot"
+          className="w-28 h-28 object-contain relative z-10 drop-shadow-[0_0_20px_rgba(255,51,153,0.6)]"
           animate={{
-            rotate: 360,
-            scale: [1, 1.2, 1],
+            y: [0, -8, 0],
+            rotate: [0, 2, -2, 0],
           }}
           transition={{
-            rotate: { duration: 3, repeat: Infinity, ease: "linear" },
-            scale: { duration: 1.5, repeat: Infinity },
+            y: { duration: 2.5, repeat: Infinity, ease: "easeInOut" },
+            rotate: { duration: 4, repeat: Infinity, ease: "easeInOut" },
           }}
-        >
-          <Sparkles className="w-5 h-5 text-neon-cyan" />
-        </motion.div>
+        />
 
-        {/* Notification Dot */}
-        {!isOpen && (
+        {/* Sparkle particles */}
+        {[...Array(3)].map((_, i) => (
           <motion.div
-            className="absolute top-0 right-0 w-4 h-4 bg-neon-pink rounded-full"
+            key={i}
+            className="absolute"
+            style={{ top: `${20 + i * 15}%`, right: `${-5 + i * 10}%` }}
             animate={{
-              scale: [1, 1.2, 1],
+              y: [-5, 5, -5],
+              opacity: [0.5, 1, 0.5],
+              scale: [0.8, 1.2, 0.8],
             }}
             transition={{
-              duration: 1,
+              duration: 2 + i * 0.5,
               repeat: Infinity,
+              delay: i * 0.3,
             }}
-          />
+          >
+            <Sparkles className="w-4 h-4 text-neon-cyan" />
+          </motion.div>
+        ))}
+
+        {!isOpen && (
+          <motion.div
+            className="absolute -top-1 -right-1 w-5 h-5 bg-neon-pink rounded-full flex items-center justify-center"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <span className="text-xs">💬</span>
+          </motion.div>
         )}
       </motion.button>
     </div>

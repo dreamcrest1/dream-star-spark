@@ -1,13 +1,47 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import Preloader from '@/components/Preloader';
+import InteractiveBackground from '@/components/InteractiveBackground';
+import CursorTrail from '@/components/CursorTrail';
+import Navbar from '@/components/Navbar';
+import Hero from '@/components/Hero';
+import Categories from '@/components/Categories';
+import FeaturedProducts from '@/components/FeaturedProducts';
+import About from '@/components/About';
+import Footer from '@/components/Footer';
+import Mascot from '@/components/Mascot';
+import MusicToggle from '@/components/MusicToggle';
 
 const Index = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <>
+      {isLoading && <Preloader onComplete={() => setIsLoading(false)} />}
+      
+      {!isLoading && (
+        <div className="relative min-h-screen">
+          {/* Background Effects */}
+          <InteractiveBackground />
+          <CursorTrail />
+
+          {/* Main Content */}
+          <div className="relative z-10">
+            <Navbar />
+            <main>
+              <Hero />
+              <Categories />
+              <FeaturedProducts />
+              <About />
+            </main>
+            <Footer />
+          </div>
+
+          {/* Floating Elements */}
+          <Mascot />
+          <MusicToggle />
+        </div>
+      )}
+    </>
   );
 };
 

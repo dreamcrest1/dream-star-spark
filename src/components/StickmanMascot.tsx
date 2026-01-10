@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
-import { X, RefreshCw, Sparkles } from 'lucide-react';
+import { X, RefreshCw, Sparkles, Volume2, VolumeX } from 'lucide-react';
 
 interface Fact {
   text: string;
@@ -23,13 +23,26 @@ const facts: Fact[] = [
   { text: "Get 80% OFF on premium tools at Dreamstar! 🚀", type: 'trivia' },
 ];
 
+const STORAGE_KEY = 'mascot_dialog_closed';
+
 const StickmanMascot = () => {
+  // Check localStorage for persistent close state
+  const [isClosed, setIsClosed] = useState(() => {
+    try {
+      return localStorage.getItem(STORAGE_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [isOpen, setIsOpen] = useState(false);
   const [currentFact, setCurrentFact] = useState<Fact | null>(null);
   const [isTyping, setIsTyping] = useState(false);
   const [displayedText, setDisplayedText] = useState('');
   const [isWaving, setIsWaving] = useState(false);
   const [isJumping, setIsJumping] = useState(false);
+  const [isDancing, setIsDancing] = useState(false);
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [headTilt, setHeadTilt] = useState(0);
   const controls = useAnimation();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -57,8 +70,10 @@ const StickmanMascot = () => {
     }
   }, [isTyping, currentFact]);
 
-  // Auto-open after delay
+  // Auto-open after delay (only if not closed by user)
   useEffect(() => {
+    if (isClosed) return;
+    
     const timer = setTimeout(() => {
       if (!isOpen) {
         setIsOpen(true);
@@ -68,30 +83,54 @@ const StickmanMascot = () => {
       }
     }, 3000);
     return () => clearTimeout(timer);
-  }, [getRandomFact, isOpen]);
+  }, [getRandomFact, isOpen, isClosed]);
 
   // Random animations
   useEffect(() => {
     const interval = setInterval(() => {
       const random = Math.random();
-      if (random > 0.7) {
+      if (random > 0.85) {
+        setIsSpinning(true);
+        setTimeout(() => setIsSpinning(false), 1000);
+      } else if (random > 0.7) {
+        setIsDancing(true);
+        setTimeout(() => setIsDancing(false), 2000);
+      } else if (random > 0.55) {
         setIsJumping(true);
         setTimeout(() => setIsJumping(false), 600);
       } else if (random > 0.4) {
         setIsWaving(true);
         setTimeout(() => setIsWaving(false), 1500);
+      } else if (random > 0.3) {
+        setHeadTilt(Math.random() * 20 - 10);
+        setTimeout(() => setHeadTilt(0), 1000);
       }
-    }, 5000);
+    }, 4000);
     return () => clearInterval(interval);
   }, []);
 
   const handleClick = () => {
+    if (isClosed) {
+      // Re-open and reset the closed state
+      setIsClosed(false);
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {}
+    }
     setIsOpen(!isOpen);
     if (!isOpen) {
       getRandomFact();
       setIsJumping(true);
       setTimeout(() => setIsJumping(false), 600);
     }
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setIsClosed(true);
+    try {
+      localStorage.setItem(STORAGE_KEY, 'true');
+    } catch {}
   };
 
   const getTypeColor = (type: string) => {
@@ -131,7 +170,7 @@ const StickmanMascot = () => {
                 <button onClick={getRandomFact} className="p-1 hover:bg-muted rounded-full transition-colors">
                   <RefreshCw className="w-4 h-4 text-muted-foreground hover:text-neon-cyan" />
                 </button>
-                <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-muted rounded-full transition-colors">
+                <button onClick={handleClose} className="p-1 hover:bg-muted rounded-full transition-colors">
                   <X className="w-4 h-4 text-muted-foreground hover:text-neon-pink" />
                 </button>
               </div>
@@ -165,141 +204,233 @@ const StickmanMascot = () => {
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        {/* SVG Stickman */}
+        {/* 3D-style SVG Character */}
         <motion.svg
-          width="100"
-          height="120"
-          viewBox="0 0 100 120"
-          className="relative z-10 drop-shadow-[0_0_15px_rgba(255,51,153,0.5)]"
-          animate={isJumping ? { y: [0, -20, 0] } : { y: [0, -5, 0] }}
-          transition={isJumping ? { duration: 0.6, ease: "easeOut" } : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          width="120"
+          height="140"
+          viewBox="0 0 120 140"
+          className="relative z-10 drop-shadow-[0_0_20px_rgba(255,51,153,0.6)]"
+          animate={
+            isSpinning 
+              ? { rotateY: [0, 360], y: [0, -10, 0] }
+              : isDancing 
+                ? { rotate: [-5, 5, -5, 5, 0], y: [0, -8, 0, -8, 0] }
+                : isJumping 
+                  ? { y: [0, -25, 0], scale: [1, 1.1, 1] } 
+                  : { y: [0, -5, 0] }
+          }
+          transition={
+            isSpinning 
+              ? { duration: 1, ease: "easeInOut" }
+              : isDancing 
+                ? { duration: 0.5, repeat: 3 }
+                : isJumping 
+                  ? { duration: 0.6, ease: "easeOut" } 
+                  : { duration: 2, repeat: Infinity, ease: "easeInOut" }
+          }
+          style={{ transformStyle: 'preserve-3d' }}
         >
-          {/* Head */}
-          <motion.circle
-            cx="50"
-            cy="20"
-            r="15"
-            fill="none"
-            stroke="url(#headGradient)"
-            strokeWidth="3"
-            animate={{ scale: [1, 1.02, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
+          {/* 3D Shadow/Depth layer */}
+          <ellipse cx="60" cy="135" rx="25" ry="5" fill="hsl(var(--neon-purple))" opacity="0.3" />
           
-          {/* Eyes */}
-          <motion.circle
-            cx="44"
-            cy="18"
-            r="3"
-            fill="hsl(var(--neon-cyan))"
-            animate={{ scaleY: [1, 0.1, 1] }}
-            transition={{ duration: 0.2, repeat: Infinity, repeatDelay: 4 }}
-          />
-          <motion.circle
-            cx="56"
-            cy="18"
-            r="3"
-            fill="hsl(var(--neon-cyan))"
-            animate={{ scaleY: [1, 0.1, 1] }}
-            transition={{ duration: 0.2, repeat: Infinity, repeatDelay: 4 }}
-          />
-          
-          {/* Smile */}
-          <motion.path
-            d="M 42 26 Q 50 32 58 26"
-            fill="none"
-            stroke="hsl(var(--neon-pink))"
+          {/* Body - 3D capsule shape */}
+          <motion.ellipse
+            cx="60"
+            cy="75"
+            rx="18"
+            ry="30"
+            fill="url(#bodyGradient3D)"
+            stroke="url(#bodyStroke)"
             strokeWidth="2"
-            strokeLinecap="round"
-            animate={{ d: isOpen ? "M 42 26 Q 50 34 58 26" : "M 42 26 Q 50 32 58 26" }}
           />
+          
+          {/* Body shine */}
+          <ellipse cx="52" cy="65" rx="6" ry="15" fill="hsl(var(--neon-cyan))" opacity="0.3" />
+          
+          {/* Head - 3D sphere effect */}
+          <motion.g
+            animate={{ rotate: headTilt }}
+            style={{ transformOrigin: '60px 30px' }}
+          >
+            <motion.circle
+              cx="60"
+              cy="30"
+              r="22"
+              fill="url(#headGradient3D)"
+              stroke="url(#headStroke)"
+              strokeWidth="2"
+              animate={{ scale: [1, 1.02, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+            
+            {/* Head shine */}
+            <circle cx="52" cy="22" r="8" fill="hsl(var(--neon-pink))" opacity="0.3" />
+            
+            {/* Eyes with 3D depth */}
+            <motion.g
+              animate={{ scaleY: [1, 0.1, 1] }}
+              transition={{ duration: 0.2, repeat: Infinity, repeatDelay: 4 }}
+            >
+              <ellipse cx="52" cy="28" rx="5" ry="6" fill="white" />
+              <ellipse cx="68" cy="28" rx="5" ry="6" fill="white" />
+              <motion.circle
+                cx="53"
+                cy="28"
+                r="3"
+                fill="hsl(var(--neon-cyan))"
+                animate={{ x: [-1, 1, -1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              <motion.circle
+                cx="69"
+                cy="28"
+                r="3"
+                fill="hsl(var(--neon-cyan))"
+                animate={{ x: [-1, 1, -1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              {/* Eye sparkle */}
+              <circle cx="50" cy="26" r="1.5" fill="white" />
+              <circle cx="66" cy="26" r="1.5" fill="white" />
+            </motion.g>
+            
+            {/* Mouth */}
+            <motion.path
+              d={isOpen ? "M 52 40 Q 60 48 68 40" : "M 52 40 Q 60 44 68 40"}
+              fill="none"
+              stroke="hsl(var(--neon-pink))"
+              strokeWidth="3"
+              strokeLinecap="round"
+            />
+            
+            {/* Blush */}
+            <circle cx="45" cy="35" r="4" fill="hsl(var(--neon-pink))" opacity="0.4" />
+            <circle cx="75" cy="35" r="4" fill="hsl(var(--neon-pink))" opacity="0.4" />
+            
+            {/* Antenna/Hair */}
+            <motion.path
+              d="M 60 8 Q 65 -5 70 8"
+              fill="none"
+              stroke="hsl(var(--neon-purple))"
+              strokeWidth="3"
+              strokeLinecap="round"
+              animate={{ d: ["M 60 8 Q 65 -5 70 8", "M 60 8 Q 55 -5 60 8", "M 60 8 Q 65 -5 70 8"] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+            <motion.circle
+              cx="70"
+              cy="5"
+              r="4"
+              fill="hsl(var(--neon-cyan))"
+              animate={{ scale: [1, 1.3, 1], opacity: [0.8, 1, 0.8] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            />
+          </motion.g>
 
-          {/* Body */}
-          <motion.line
-            x1="50"
-            y1="35"
-            x2="50"
-            y2="70"
-            stroke="url(#bodyGradient)"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-
-          {/* Left Arm */}
-          <motion.line
-            x1="50"
-            y1="45"
-            x2={isWaving ? "25" : "30"}
-            y2={isWaving ? "35" : "60"}
-            stroke="url(#bodyGradient)"
-            strokeWidth="3"
+          {/* Left Arm - 3D */}
+          <motion.path
+            d={isWaving 
+              ? "M 42 60 Q 25 45 20 30" 
+              : "M 42 60 Q 30 70 25 85"
+            }
+            fill="none"
+            stroke="url(#armGradient)"
+            strokeWidth="8"
             strokeLinecap="round"
             animate={isWaving ? { 
-              x2: [25, 20, 25, 20, 25],
-              y2: [35, 30, 35, 30, 35]
+              d: ["M 42 60 Q 25 45 20 30", "M 42 60 Q 20 40 15 25", "M 42 60 Q 25 45 20 30"]
             } : {}}
-            transition={{ duration: 0.5, repeat: isWaving ? 2 : 0 }}
+            transition={{ duration: 0.3, repeat: isWaving ? 4 : 0 }}
+          />
+          {/* Left hand */}
+          <motion.circle
+            cx={isWaving ? 20 : 25}
+            cy={isWaving ? 30 : 85}
+            r="6"
+            fill="url(#headGradient3D)"
+            stroke="url(#headStroke)"
+            strokeWidth="1"
           />
 
-          {/* Right Arm */}
-          <motion.line
-            x1="50"
-            y1="45"
-            x2="70"
-            y2="60"
-            stroke="url(#bodyGradient)"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-
-          {/* Left Leg */}
-          <motion.line
-            x1="50"
-            y1="70"
-            x2="35"
-            y2="100"
-            stroke="url(#bodyGradient)"
-            strokeWidth="3"
-            strokeLinecap="round"
-            animate={isJumping ? { x2: [35, 40, 35] } : {}}
-            transition={{ duration: 0.3 }}
-          />
-
-          {/* Right Leg */}
-          <motion.line
-            x1="50"
-            y1="70"
-            x2="65"
-            y2="100"
-            stroke="url(#bodyGradient)"
-            strokeWidth="3"
-            strokeLinecap="round"
-            animate={isJumping ? { x2: [65, 60, 65] } : {}}
-            transition={{ duration: 0.3 }}
-          />
-
-          {/* Cape/Scarf */}
+          {/* Right Arm - 3D */}
           <motion.path
-            d="M 45 38 Q 35 50 25 65"
+            d="M 78 60 Q 90 70 95 85"
             fill="none"
-            stroke="hsl(var(--neon-purple))"
-            strokeWidth="2"
+            stroke="url(#armGradient)"
+            strokeWidth="8"
             strokeLinecap="round"
+          />
+          {/* Right hand */}
+          <circle cx="95" cy="85" r="6" fill="url(#headGradient3D)" stroke="url(#headStroke)" strokeWidth="1" />
+
+          {/* Left Leg - 3D */}
+          <motion.path
+            d="M 52 100 Q 45 115 40 130"
+            fill="none"
+            stroke="url(#legGradient)"
+            strokeWidth="10"
+            strokeLinecap="round"
+            animate={isDancing ? { d: ["M 52 100 Q 45 115 40 130", "M 52 100 Q 40 110 35 125", "M 52 100 Q 45 115 40 130"] } : {}}
+            transition={{ duration: 0.25, repeat: isDancing ? 6 : 0 }}
+          />
+          {/* Left foot */}
+          <ellipse cx="40" cy="132" rx="8" ry="4" fill="hsl(var(--neon-purple))" />
+
+          {/* Right Leg - 3D */}
+          <motion.path
+            d="M 68 100 Q 75 115 80 130"
+            fill="none"
+            stroke="url(#legGradient)"
+            strokeWidth="10"
+            strokeLinecap="round"
+            animate={isDancing ? { d: ["M 68 100 Q 75 115 80 130", "M 68 100 Q 80 110 85 125", "M 68 100 Q 75 115 80 130"] } : {}}
+            transition={{ duration: 0.25, repeat: isDancing ? 6 : 0, delay: 0.125 }}
+          />
+          {/* Right foot */}
+          <ellipse cx="80" cy="132" rx="8" ry="4" fill="hsl(var(--neon-purple))" />
+
+          {/* Cape */}
+          <motion.path
+            d="M 45 52 Q 30 70 20 100 Q 35 95 45 85"
+            fill="hsl(var(--neon-purple))"
+            opacity="0.6"
             animate={{ 
-              d: ["M 45 38 Q 35 50 25 65", "M 45 38 Q 30 50 20 60", "M 45 38 Q 35 50 25 65"]
+              d: [
+                "M 45 52 Q 30 70 20 100 Q 35 95 45 85",
+                "M 45 52 Q 25 65 15 95 Q 30 90 45 85",
+                "M 45 52 Q 30 70 20 100 Q 35 95 45 85"
+              ]
             }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           />
 
-          {/* Gradients */}
+          {/* 3D Gradients */}
           <defs>
-            <linearGradient id="headGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <radialGradient id="headGradient3D" cx="40%" cy="30%" r="60%">
               <stop offset="0%" stopColor="hsl(var(--neon-pink))" />
-              <stop offset="100%" stopColor="hsl(var(--neon-cyan))" />
-            </linearGradient>
-            <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="70%" stopColor="hsl(320 100% 40%)" />
+              <stop offset="100%" stopColor="hsl(320 100% 25%)" />
+            </radialGradient>
+            <linearGradient id="headStroke" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="hsl(var(--neon-cyan))" />
               <stop offset="100%" stopColor="hsl(var(--neon-pink))" />
+            </linearGradient>
+            <radialGradient id="bodyGradient3D" cx="30%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="hsl(var(--neon-cyan))" />
+              <stop offset="60%" stopColor="hsl(190 100% 40%)" />
+              <stop offset="100%" stopColor="hsl(190 100% 25%)" />
+            </radialGradient>
+            <linearGradient id="bodyStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="hsl(var(--neon-pink))" />
+              <stop offset="100%" stopColor="hsl(var(--neon-purple))" />
+            </linearGradient>
+            <linearGradient id="armGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="hsl(var(--neon-cyan))" />
+              <stop offset="100%" stopColor="hsl(190 100% 35%)" />
+            </linearGradient>
+            <linearGradient id="legGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="hsl(var(--neon-purple))" />
+              <stop offset="100%" stopColor="hsl(280 100% 35%)" />
             </linearGradient>
           </defs>
         </motion.svg>

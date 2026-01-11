@@ -2,11 +2,10 @@ import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, X } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { products, type Product } from '@/data/products';
+import { products } from '@/data/products';
 import ProductCard from '@/components/ProductCard';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import InteractiveBackground from '@/components/InteractiveBackground';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -18,7 +17,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-// Category mapping from URL slugs to actual category names
 const categoryMap: Record<string, string> = {
   'ai-tools': 'AI Tools',
   'video-editing': 'Video Editing',
@@ -41,7 +39,6 @@ const Products = () => {
   const [sortBy, setSortBy] = useState<string>('name');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Set category from URL on mount
   useEffect(() => {
     if (categoryFromUrl) {
       const mappedCategory = categoryMap[categoryFromUrl];
@@ -52,17 +49,14 @@ const Products = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [categoryFromUrl]);
 
-  // Get unique categories
   const categories = useMemo(() => {
     const cats = [...new Set(products.map((p) => p.category))];
     return cats.sort();
   }, []);
 
-  // Filter and sort products
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
-    // Filter by search
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
@@ -73,12 +67,10 @@ const Products = () => {
       );
     }
 
-    // Filter by category
     if (selectedCategory !== 'all') {
       result = result.filter((p) => p.category === selectedCategory);
     }
 
-    // Sort
     switch (sortBy) {
       case 'price-low':
         result.sort((a, b) => (a.salePrice || a.regularPrice) - (b.salePrice || b.regularPrice));
@@ -101,8 +93,7 @@ const Products = () => {
   }, [searchQuery, selectedCategory, sortBy]);
 
   return (
-    <div className="min-h-screen relative">
-      <InteractiveBackground />
+    <div className="min-h-screen relative bg-background">
       <Navbar />
       
       <main className="relative z-10 pt-24 pb-16">

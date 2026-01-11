@@ -3,7 +3,6 @@ import { Phone, Mail, MapPin, MessageCircle, Instagram, Youtube } from 'lucide-r
 import { siteContent } from '@/data/siteContent';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import InteractiveBackground from '@/components/InteractiveBackground';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import { Button } from '@/components/ui/button';
 
@@ -42,8 +41,7 @@ const Contact = () => {
   ];
 
   return (
-    <div className="min-h-screen relative">
-      <InteractiveBackground />
+    <div className="min-h-screen relative bg-background">
       <Navbar />
       
       <main className="relative z-10 pt-24 pb-16">

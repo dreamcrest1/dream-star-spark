@@ -6,15 +6,18 @@ import heroBg from '@/assets/hero-bg.jpg';
 const Hero = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-24 pb-16 px-4 overflow-hidden">
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: `url(${heroBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
+      {/* Background Video */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster={heroBg}
+          className="absolute w-full h-full object-cover"
+        >
+          <source src="/video/hero-video.mp4" type="video/mp4" />
+        </video>
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
       </div>

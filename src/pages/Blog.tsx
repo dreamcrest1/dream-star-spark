@@ -1,16 +1,14 @@
 import { motion } from 'framer-motion';
-import { Clock, User, Calendar, ArrowRight } from 'lucide-react';
+import { Clock, Calendar, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { blogs } from '@/data/blogs';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import InteractiveBackground from '@/components/InteractiveBackground';
 import WhatsAppButton from '@/components/WhatsAppButton';
 
 const Blog = () => {
   return (
-    <div className="min-h-screen relative">
-      <InteractiveBackground />
+    <div className="min-h-screen relative bg-background">
       <Navbar />
 
       <main className="relative z-10 pt-24 pb-16">

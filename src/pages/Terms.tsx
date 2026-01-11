@@ -1,11 +1,10 @@
 import { motion } from 'framer-motion';
-import { Shield, AlertCircle, Clock, CreditCard, RefreshCw, HelpCircle } from 'lucide-react';
+import { Shield, AlertCircle, Clock, CreditCard, Wrench, RefreshCw, HelpCircle } from 'lucide-react';
 import { siteContent } from '@/data/siteContent';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import WhatsAppButton from '@/components/WhatsAppButton';
 import InteractiveBackground from '@/components/InteractiveBackground';
-import CursorTrail from '@/components/CursorTrail';
+import WhatsAppButton from '@/components/WhatsAppButton';
 
 const Terms = () => {
   const { terms, company } = siteContent;
@@ -18,9 +17,8 @@ const Terms = () => {
   ];
 
   return (
-    <div className="min-h-screen relative bg-background">
+    <div className="min-h-screen relative">
       <InteractiveBackground />
-      <CursorTrail />
       <Navbar />
       
       <main className="relative z-10 pt-24 pb-16">

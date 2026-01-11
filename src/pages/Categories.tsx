@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Bot, Video, Users, Palette, Tv, Globe, Code, Pencil, Search, ArrowRight } from 'lucide-react';
+import { Bot, Video, Briefcase, Users, Palette, Tv, Globe, Code, Pencil, Search, ArrowRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import WhatsAppButton from '@/components/WhatsAppButton';
 import InteractiveBackground from '@/components/InteractiveBackground';
-import CursorTrail from '@/components/CursorTrail';
+import WhatsAppButton from '@/components/WhatsAppButton';
 
 const categories = [
   { 
@@ -98,9 +97,8 @@ const Categories = () => {
   }, []);
 
   return (
-    <div className="min-h-screen relative bg-background">
+    <div className="min-h-screen relative">
       <InteractiveBackground />
-      <CursorTrail />
       <Navbar />
       
       <main className="relative z-10 pt-24 pb-16">

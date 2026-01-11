@@ -1,65 +1,114 @@
-import { useEffect, useCallback } from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { useEffect, useRef, useCallback } from 'react';
+
+interface Particle {
+  x: number;
+  y: number;
+  alpha: number;
+  color: string;
+  size: number;
+}
 
 const CursorTrail = () => {
-  const cursorX = useMotionValue(-100);
-  const cursorY = useMotionValue(-100);
-  
-  const springConfig = { damping: 25, stiffness: 700 };
-  const cursorXSpring = useSpring(cursorX, springConfig);
-  const cursorYSpring = useSpring(cursorY, springConfig);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particlesRef = useRef<Particle[]>([]);
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const animationRef = useRef<number>();
 
-  // Trail positions with different spring configs
-  const trail1X = useMotionValue(-100);
-  const trail1Y = useMotionValue(-100);
-  const trail2X = useMotionValue(-100);
-  const trail2Y = useMotionValue(-100);
-  const trail3X = useMotionValue(-100);
-  const trail3Y = useMotionValue(-100);
+  const colors = [
+    'hsl(320, 100%, 60%)', // neon pink
+    'hsl(180, 100%, 50%)', // neon cyan
+    'hsl(280, 100%, 65%)', // neon purple
+  ];
 
-  const trail1XSpring = useSpring(trail1X, { damping: 35, stiffness: 350 });
-  const trail1YSpring = useSpring(trail1Y, { damping: 35, stiffness: 350 });
-  const trail2XSpring = useSpring(trail2X, { damping: 40, stiffness: 300 });
-  const trail2YSpring = useSpring(trail2Y, { damping: 40, stiffness: 300 });
-  const trail3XSpring = useSpring(trail3X, { damping: 45, stiffness: 250 });
-  const trail3YSpring = useSpring(trail3Y, { damping: 45, stiffness: 250 });
+  const addParticle = useCallback((x: number, y: number) => {
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    particlesRef.current.push({
+      x,
+      y,
+      alpha: 1,
+      color,
+      size: Math.random() * 4 + 2,
+    });
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    cursorX.set(e.clientX);
-    cursorY.set(e.clientY);
-    
-    setTimeout(() => { trail1X.set(e.clientX); trail1Y.set(e.clientY); }, 50);
-    setTimeout(() => { trail2X.set(e.clientX); trail2Y.set(e.clientY); }, 100);
-    setTimeout(() => { trail3X.set(e.clientX); trail3Y.set(e.clientY); }, 150);
-  }, [cursorX, cursorY, trail1X, trail1Y, trail2X, trail2Y, trail3X, trail3Y]);
+    // Limit particles
+    if (particlesRef.current.length > 50) {
+      particlesRef.current.shift();
+    }
+  }, []);
+
+  const animate = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    particlesRef.current = particlesRef.current.filter((particle) => {
+      particle.alpha -= 0.02;
+      particle.size *= 0.98;
+
+      if (particle.alpha <= 0) return false;
+
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+      ctx.fillStyle = particle.color.replace(')', `, ${particle.alpha})`).replace('hsl', 'hsla');
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = particle.color;
+      ctx.fill();
+
+      return true;
+    });
+
+    animationRef.current = requestAnimationFrame(animate);
+  }, []);
 
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY };
+      addParticle(e.clientX, e.clientY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        mouseRef.current = { x: touch.clientX, y: touch.clientY };
+        addParticle(touch.clientX, touch.clientY);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [handleMouseMove]);
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchmove', handleTouchMove);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [addParticle, animate]);
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-50 hidden md:block">
-      {/* Main cursor */}
-      <motion.div
-        className="absolute w-4 h-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-primary to-accent mix-blend-screen"
-        style={{ x: cursorXSpring, y: cursorYSpring }}
-      />
-      
-      {/* Trail particles */}
-      <motion.div
-        className="absolute w-3 h-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/60 mix-blend-screen"
-        style={{ x: trail1XSpring, y: trail1YSpring }}
-      />
-      <motion.div
-        className="absolute w-2.5 h-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/40 mix-blend-screen"
-        style={{ x: trail2XSpring, y: trail2YSpring }}
-      />
-      <motion.div
-        className="absolute w-2 h-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/20 mix-blend-screen"
-        style={{ x: trail3XSpring, y: trail3YSpring }}
-      />
-    </div>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-[60]"
+      style={{ mixBlendMode: 'screen' }}
+    />
   );
 };
 

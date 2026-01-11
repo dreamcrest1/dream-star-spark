@@ -5,9 +5,8 @@ import { ArrowLeft, Clock, Calendar, User, Share2 } from 'lucide-react';
 import { blogs } from '@/data/blogs';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import WhatsAppButton from '@/components/WhatsAppButton';
 import InteractiveBackground from '@/components/InteractiveBackground';
-import CursorTrail from '@/components/CursorTrail';
+import WhatsAppButton from '@/components/WhatsAppButton';
 import { Button } from '@/components/ui/button';
 
 const BlogPost = () => {
@@ -20,9 +19,8 @@ const BlogPost = () => {
 
   if (!blog) {
     return (
-      <div className="min-h-screen relative bg-background">
+      <div className="min-h-screen relative">
         <InteractiveBackground />
-        <CursorTrail />
         <Navbar />
         <main className="relative z-10 pt-24 pb-16 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
@@ -40,9 +38,8 @@ const BlogPost = () => {
   const relatedPosts = blogs.filter(b => b.category === blog.category && b.id !== blog.id).slice(0, 2);
 
   return (
-    <div className="min-h-screen relative bg-background">
+    <div className="min-h-screen relative">
       <InteractiveBackground />
-      <CursorTrail />
       <Navbar />
 
       <main className="relative z-10 pt-24 pb-16">

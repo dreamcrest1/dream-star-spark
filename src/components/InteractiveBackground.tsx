@@ -1,89 +1,184 @@
-import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useRef, useCallback } from 'react';
 
-const InteractiveBackground = memo(() => {
+interface Star {
+  x: number;
+  y: number;
+  z: number;
+  px: number;
+  py: number;
+}
+
+const InteractiveBackground = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const starsRef = useRef<Star[]>([]);
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const animationRef = useRef<number>();
+
+  const initStars = useCallback((width: number, height: number) => {
+    const numStars = Math.min(200, Math.floor((width * height) / 8000));
+    starsRef.current = [];
+
+    for (let i = 0; i < numStars; i++) {
+      starsRef.current.push({
+        x: Math.random() * width - width / 2,
+        y: Math.random() * height - height / 2,
+        z: Math.random() * width,
+        px: 0,
+        py: 0,
+      });
+    }
+  }, []);
+
+  const animate = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    // Clear with fade effect
+    ctx.fillStyle = 'rgba(10, 5, 20, 0.1)';
+    ctx.fillRect(0, 0, width, height);
+
+    // Mouse influence
+    const mouseInfluenceX = (mouseRef.current.x - centerX) * 0.0001;
+    const mouseInfluenceY = (mouseRef.current.y - centerY) * 0.0001;
+
+    starsRef.current.forEach((star) => {
+      star.z -= 1.5;
+
+      if (star.z <= 0) {
+        star.x = Math.random() * width - centerX;
+        star.y = Math.random() * height - centerY;
+        star.z = width;
+        star.px = 0;
+        star.py = 0;
+      }
+
+      // Apply mouse influence
+      star.x += mouseInfluenceX * star.z;
+      star.y += mouseInfluenceY * star.z;
+
+      const sx = (star.x / star.z) * width + centerX;
+      const sy = (star.y / star.z) * height + centerY;
+
+      if (star.px !== 0 && star.py !== 0) {
+        const opacity = 1 - star.z / width;
+        const size = (1 - star.z / width) * 2;
+
+        // Draw line
+        ctx.beginPath();
+        ctx.moveTo(star.px, star.py);
+        ctx.lineTo(sx, sy);
+
+        // Alternate colors
+        const colorIndex = Math.floor(star.z) % 3;
+        if (colorIndex === 0) {
+          ctx.strokeStyle = `rgba(255, 51, 153, ${opacity})`;
+        } else if (colorIndex === 1) {
+          ctx.strokeStyle = `rgba(0, 255, 255, ${opacity})`;
+        } else {
+          ctx.strokeStyle = `rgba(178, 102, 255, ${opacity})`;
+        }
+
+        ctx.lineWidth = size;
+        ctx.stroke();
+
+        // Draw point
+        ctx.beginPath();
+        ctx.arc(sx, sy, size, 0, Math.PI * 2);
+        ctx.fillStyle = ctx.strokeStyle;
+        ctx.fill();
+      }
+
+      star.px = sx;
+      star.py = sy;
+    });
+
+    // Draw grid lines at the bottom (horizon effect)
+    const gridY = height * 0.7;
+    const gridSpacing = 50;
+    const perspective = 0.5;
+
+    ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
+
+    // Horizontal lines with perspective
+    for (let i = 0; i < 15; i++) {
+      const y = gridY + i * gridSpacing * Math.pow(perspective, -i * 0.1);
+      if (y > height) break;
+
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+
+    // Vertical lines with perspective
+    for (let i = -10; i <= 10; i++) {
+      const x1 = centerX + i * gridSpacing;
+      const x2 = centerX + i * gridSpacing * 5;
+
+      ctx.beginPath();
+      ctx.moveTo(x1, gridY);
+      ctx.lineTo(x2, height);
+      ctx.stroke();
+    }
+
+    animationRef.current = requestAnimationFrame(animate);
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initStars(canvas.width, canvas.height);
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY };
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        mouseRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchmove', handleTouchMove);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [animate, initStars]);
+
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden">
-      {/* Base gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-background" />
-      
-      {/* Animated gradient orbs */}
-      <motion.div
-        className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 rounded-full opacity-30"
-        style={{
-          background: 'radial-gradient(circle, hsl(var(--primary) / 0.4) 0%, transparent 70%)',
-          filter: 'blur(60px)',
-        }}
-        animate={{
-          x: [0, 100, 50, 0],
-          y: [0, 50, 100, 0],
-          scale: [1, 1.2, 0.9, 1],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-      />
-      
-      <motion.div
-        className="absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2 rounded-full opacity-30"
-        style={{
-          background: 'radial-gradient(circle, hsl(var(--accent) / 0.4) 0%, transparent 70%)',
-          filter: 'blur(60px)',
-        }}
-        animate={{
-          x: [0, -80, -40, 0],
-          y: [0, -60, -120, 0],
-          scale: [1, 0.9, 1.1, 1],
-        }}
-        transition={{
-          duration: 25,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-      />
-      
-      <motion.div
-        className="absolute top-1/2 left-1/2 w-1/3 h-1/3 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20"
-        style={{
-          background: 'radial-gradient(circle, hsl(var(--secondary) / 0.5) 0%, transparent 70%)',
-          filter: 'blur(80px)',
-        }}
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.2, 0.35, 0.2],
-        }}
-        transition={{
-          duration: 15,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-      />
-      
-      {/* Grid overlay */}
-      <div 
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `
-            linear-gradient(hsl(var(--primary) / 0.3) 1px, transparent 1px),
-            linear-gradient(90deg, hsl(var(--primary) / 0.3) 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px',
-        }}
-      />
-      
-      {/* Noise texture overlay */}
-      <div 
-        className="absolute inset-0 opacity-[0.015]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-        }}
-      />
-    </div>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 z-0"
+      style={{ 
+        background: 'linear-gradient(180deg, hsl(270 50% 6%) 0%, hsl(280 60% 12%) 50%, hsl(320 50% 15%) 100%)'
+      }}
+    />
   );
-});
-
-InteractiveBackground.displayName = 'InteractiveBackground';
+};
 
 export default InteractiveBackground;

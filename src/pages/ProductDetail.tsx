@@ -5,9 +5,8 @@ import { ArrowLeft, ExternalLink, Shield, Clock, Zap, Star, CheckCircle } from '
 import { products } from '@/data/products';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import WhatsAppButton from '@/components/WhatsAppButton';
 import InteractiveBackground from '@/components/InteractiveBackground';
-import CursorTrail from '@/components/CursorTrail';
+import WhatsAppButton from '@/components/WhatsAppButton';
 import { Button } from '@/components/ui/button';
 import ProductCard from '@/components/ProductCard';
 
@@ -15,15 +14,15 @@ const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const product = products.find(p => p.id === Number(id));
 
+  // Scroll to top when component mounts or id changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [id]);
 
   if (!product) {
     return (
-      <div className="min-h-screen relative bg-background">
+      <div className="min-h-screen relative">
         <InteractiveBackground />
-        <CursorTrail />
         <Navbar />
         <main className="relative z-10 pt-24 pb-16 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
@@ -54,9 +53,8 @@ const ProductDetail = () => {
   ];
 
   return (
-    <div className="min-h-screen relative bg-background">
+    <div className="min-h-screen relative">
       <InteractiveBackground />
-      <CursorTrail />
       <Navbar />
       
       <main className="relative z-10 pt-24 pb-16">

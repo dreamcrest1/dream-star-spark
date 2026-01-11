@@ -5,6 +5,8 @@ import { Bot, Video, Users, Palette, Tv, Globe, Code, Pencil, Search, ArrowRight
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import InteractiveBackground from '@/components/InteractiveBackground';
+import CursorTrail from '@/components/CursorTrail';
 
 const categories = [
   { 
@@ -97,6 +99,8 @@ const Categories = () => {
 
   return (
     <div className="min-h-screen relative bg-background">
+      <InteractiveBackground />
+      <CursorTrail />
       <Navbar />
       
       <main className="relative z-10 pt-24 pb-16">

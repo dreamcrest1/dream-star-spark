@@ -5,10 +5,14 @@ import { blogs } from '@/data/blogs';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import InteractiveBackground from '@/components/InteractiveBackground';
+import CursorTrail from '@/components/CursorTrail';
 
 const Blog = () => {
   return (
     <div className="min-h-screen relative bg-background">
+      <InteractiveBackground />
+      <CursorTrail />
       <Navbar />
 
       <main className="relative z-10 pt-24 pb-16">

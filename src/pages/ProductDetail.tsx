@@ -6,6 +6,8 @@ import { products } from '@/data/products';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import InteractiveBackground from '@/components/InteractiveBackground';
+import CursorTrail from '@/components/CursorTrail';
 import { Button } from '@/components/ui/button';
 import ProductCard from '@/components/ProductCard';
 
@@ -20,6 +22,8 @@ const ProductDetail = () => {
   if (!product) {
     return (
       <div className="min-h-screen relative bg-background">
+        <InteractiveBackground />
+        <CursorTrail />
         <Navbar />
         <main className="relative z-10 pt-24 pb-16 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
@@ -51,6 +55,8 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen relative bg-background">
+      <InteractiveBackground />
+      <CursorTrail />
       <Navbar />
       
       <main className="relative z-10 pt-24 pb-16">

@@ -3,6 +3,9 @@ import Preloader from '@/components/Preloader';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import Footer from '@/components/Footer';
+import InteractiveBackground from '@/components/InteractiveBackground';
+import CursorTrail from '@/components/CursorTrail';
+import InteractiveElements from '@/components/InteractiveElements';
 
 // Lazy load heavy/below-fold components
 const Categories = lazy(() => import('@/components/Categories'));
@@ -25,6 +28,10 @@ const Index = () => {
       
       {!isLoading && (
         <div className="relative min-h-screen bg-background">
+          <InteractiveBackground />
+          <CursorTrail />
+          <InteractiveElements />
+          
           <div className="relative z-10">
             <Navbar />
             <main>

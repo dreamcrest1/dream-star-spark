@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Pencil, Trash2, Search } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Plus, Pencil, Trash2, Search, Link2, AlertTriangle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import AdminLayout from './AdminLayout';
 import ProductImage from '@/components/ProductImage';
+import AiAssistButton from '@/components/admin/AiAssistButton';
 
 interface ProductRow {
   id: number;
@@ -40,6 +41,11 @@ const AdminProducts = () => {
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState<ProductRow | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  // Bulk-update payment URL
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulkUrl, setBulkUrl] = useState('');
+  const [bulkBusy, setBulkBusy] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -67,7 +73,6 @@ const AdminProducts = () => {
     };
     const isNew = !items.some((i) => i.id === editing.id);
     if (isNew) {
-      // generate id if 0
       if (!payload.id) payload.id = Date.now();
       const { error } = await supabase.from('products').insert(payload);
       if (error) return toast({ title: 'Save failed', description: error.message, variant: 'destructive' });
@@ -90,10 +95,36 @@ const AdminProducts = () => {
     load();
   };
 
+  const applyBulkUrl = async () => {
+    const url = bulkUrl.trim();
+    if (!url) {
+      toast({ title: 'URL required', variant: 'destructive' });
+      return;
+    }
+    setBulkBusy(true);
+    // Update every row by setting external_url. Use a guard filter that matches all.
+    const { error, count } = await supabase
+      .from('products')
+      .update({ external_url: url }, { count: 'exact' })
+      .gte('id', 0);
+    setBulkBusy(false);
+    if (error) {
+      toast({ title: 'Bulk update failed', description: error.message, variant: 'destructive' });
+      return;
+    }
+    toast({
+      title: 'Payment links updated',
+      description: `${count ?? items.length} product${(count ?? items.length) === 1 ? '' : 's'} now point to ${url}`,
+    });
+    setBulkOpen(false);
+    setBulkUrl('');
+    load();
+  };
+
   return (
     <AdminLayout title="Products">
-      <div className="flex items-center justify-between mb-4 gap-4">
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Search products..."
@@ -102,10 +133,16 @@ const AdminProducts = () => {
             className="pl-9"
           />
         </div>
-        <Button onClick={() => setEditing({ ...empty })}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add Product
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setBulkOpen(true)}>
+            <Link2 className="w-4 h-4 mr-2" />
+            Bulk Update Payment Link
+          </Button>
+          <Button onClick={() => setEditing({ ...empty })}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Product
+          </Button>
+        </div>
       </div>
 
       <Card className="overflow-hidden">
@@ -167,7 +204,27 @@ const AdminProducts = () => {
                 </div>
               </div>
               <div>
-                <Label>Description</Label>
+                <div className="flex items-center justify-between">
+                  <Label>Description</Label>
+                  <div className="flex gap-2">
+                    <AiAssistButton
+                      task="product_description"
+                      context={{ name: editing.name, category: editing.category, current: editing.description }}
+                      onResult={(r) => setEditing({ ...editing, description: r })}
+                      label="AI Write"
+                      disabled={!editing.name}
+                    />
+                    {editing.description && (
+                      <AiAssistButton
+                        task="rewrite_cyberpunk"
+                        context={{ text: editing.description }}
+                        onResult={(r) => setEditing({ ...editing, description: r })}
+                        label="Cyberpunk Rewrite"
+                        variant="ghost"
+                      />
+                    )}
+                  </div>
+                </div>
                 <Textarea
                   value={editing.description}
                   onChange={(e) => setEditing({ ...editing, description: e.target.value })}
@@ -206,6 +263,43 @@ const AdminProducts = () => {
               </DialogFooter>
             </form>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk update payment link */}
+      <Dialog open={bulkOpen} onOpenChange={setBulkOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Link2 className="w-5 h-5" /> Bulk Update Payment Link
+            </DialogTitle>
+            <DialogDescription>
+              This will set <strong>every product's</strong> Buy-button URL to the URL below. Use it when migrating between Cosmofeed accounts or testing a new payment provider.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div>
+              <Label>New payment URL for all products</Label>
+              <Input
+                value={bulkUrl}
+                onChange={(e) => setBulkUrl(e.target.value)}
+                placeholder="https://test.com"
+                autoFocus
+              />
+            </div>
+            <div className="flex items-start gap-2 text-xs text-destructive-foreground bg-destructive/10 border border-destructive/30 rounded p-3">
+              <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5 text-destructive" />
+              <span>
+                This will overwrite the current Buy URL on <strong>{items.length}</strong> product{items.length === 1 ? '' : 's'}. There is no undo — make sure the URL is correct.
+              </span>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBulkOpen(false)}>Cancel</Button>
+            <Button onClick={applyBulkUrl} disabled={bulkBusy || !bulkUrl.trim()}>
+              {bulkBusy ? 'Updating…' : `Apply to ${items.length} product${items.length === 1 ? '' : 's'}`}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

@@ -27,8 +27,10 @@ import AdminBlogs from "./pages/admin/AdminBlogs";
 import AdminBlogEditor from "./pages/admin/AdminBlogEditor";
 import AdminBrandRules from "./pages/admin/AdminBrandRules";
 import AdminTheme from "./pages/admin/AdminTheme";
+import AdminThemePresets from "./pages/admin/AdminThemePresets";
 import AdminMedia from "./pages/admin/AdminMedia";
 import AdminSEO from "./pages/admin/AdminSEO";
+import AdminPageBuilder from "./pages/admin/AdminPageBuilder";
 import { usePageTracking } from "./hooks/usePageTracking";
 import ThemeInjector from "./components/ThemeInjector";
 
@@ -63,8 +65,10 @@ const AppShell = () => {
         <Route path="/admin/blogs/:id" element={<AdminBlogEditor />} />
         <Route path="/admin/brand-rules" element={<AdminBrandRules />} />
         <Route path="/admin/theme" element={<AdminTheme />} />
+        <Route path="/admin/theme-presets" element={<AdminThemePresets />} />
         <Route path="/admin/media" element={<AdminMedia />} />
         <Route path="/admin/seo" element={<AdminSEO />} />
+        <Route path="/admin/page-builder" element={<AdminPageBuilder />} />
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />

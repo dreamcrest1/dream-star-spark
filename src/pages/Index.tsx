@@ -11,6 +11,7 @@ import BlogSection from '@/components/BlogSection';
 import About from '@/components/About';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import { useHomeLayout, type SectionId } from '@/lib/homeLayout';
 
 const homeJsonLd = {
   '@context': 'https://schema.org',
@@ -24,8 +25,17 @@ const homeJsonLd = {
   },
 };
 
+const SECTION_COMPONENTS: Record<SectionId, React.FC> = {
+  hero: Hero,
+  categories: Categories,
+  featured: FeaturedProducts,
+  blog: BlogSection,
+  about: About,
+};
+
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const layout = useHomeLayout();
 
   return (
     <>
@@ -47,11 +57,12 @@ const Index = () => {
           <div className="relative z-10">
             <Navbar />
             <main>
-              <Hero />
-              <Categories />
-              <FeaturedProducts />
-              <BlogSection />
-              <About />
+              {layout
+                .filter((s) => s.enabled)
+                .map(({ id }) => {
+                  const Section = SECTION_COMPONENTS[id];
+                  return Section ? <Section key={id} /> : null;
+                })}
             </main>
             <Footer />
           </div>

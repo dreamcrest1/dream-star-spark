@@ -100,6 +100,7 @@ export type Database = {
       }
       media: {
         Row: {
+          alt_text: string | null
           created_at: string
           id: number
           mime_type: string | null
@@ -109,6 +110,7 @@ export type Database = {
           url: string
         }
         Insert: {
+          alt_text?: string | null
           created_at?: string
           id?: number
           mime_type?: string | null
@@ -118,6 +120,7 @@ export type Database = {
           url: string
         }
         Update: {
+          alt_text?: string | null
           created_at?: string
           id?: number
           mime_type?: string | null

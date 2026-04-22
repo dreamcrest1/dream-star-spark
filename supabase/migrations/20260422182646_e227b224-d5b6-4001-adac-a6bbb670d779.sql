@@ -1,0 +1,1 @@
+ALTER TABLE public.media ADD COLUMN IF NOT EXISTS alt_text text;

@@ -56,11 +56,35 @@ const ProductDetail = () => {
     { icon: Star, text: '15K+ Happy Customers', color: 'neon-orange' },
   ];
 
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description,
+    image: product.image,
+    category: product.category,
+    brand: { '@type': 'Brand', name: 'Dreamstar Solution' },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'INR',
+      price: product.salePrice ?? product.regularPrice,
+      availability: 'https://schema.org/InStock',
+    },
+  };
+
   return (
     <div className="min-h-screen relative">
+      <SEO
+        title={`${product.name} – Buy at ₹${(product.salePrice ?? product.regularPrice).toLocaleString()}`}
+        description={product.description.slice(0, 155)}
+        keywords={`${product.name}, ${product.category}, buy ${product.name} India`}
+        image={product.image}
+        type="product"
+        jsonLd={productJsonLd}
+      />
       <InteractiveBackground />
       <Navbar />
-      
+
       <main className="relative z-10 pt-24 pb-16">
         <div className="container mx-auto px-4">
           {/* Back Button */}

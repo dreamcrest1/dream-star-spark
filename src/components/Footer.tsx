@@ -1,9 +1,10 @@
+import { forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Instagram, Youtube } from 'lucide-react';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 
-const Footer = () => {
+const Footer = forwardRef<HTMLElement>((_, ref) => {
   const { settings } = useSiteSettings();
   const header = settings.header || {};
   const footer = settings.footer || {};
@@ -13,7 +14,7 @@ const Footer = () => {
   const quickLinks = (header.navLinks || []).filter((l: any) => l.href !== '/');
 
   return (
-    <footer className="relative pt-20 pb-8 px-4">
+    <footer ref={ref} className="relative pt-20 pb-8 px-4">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-pink to-transparent" />
 
       <div className="max-w-7xl mx-auto">
@@ -186,6 +187,8 @@ const Footer = () => {
       </div>
     </footer>
   );
-};
+});
+
+Footer.displayName = 'Footer';
 
 export default Footer;

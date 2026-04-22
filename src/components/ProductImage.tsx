@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 import { getBrandLogo, PRODUCT_PLACEHOLDER } from '@/lib/brandLogo';
 import { brandLogoFromRules, loadBrandRules, BrandRule } from '@/hooks/useBrandRules';
 
@@ -17,7 +17,7 @@ interface ProductImageProps {
  *
  * Brand-logo fallbacks render with `object-contain` so logos are not cropped.
  */
-const ProductImage = ({ src, name, className = '', loading = 'lazy' }: ProductImageProps) => {
+const ProductImage = forwardRef<HTMLImageElement, ProductImageProps>(({ src, name, className = '', loading = 'lazy' }, ref) => {
   const [rules, setRules] = useState<BrandRule[] | null>(null);
 
   useEffect(() => {
@@ -51,6 +51,7 @@ const ProductImage = ({ src, name, className = '', loading = 'lazy' }: ProductIm
 
   return (
     <img
+      ref={ref}
       src={current}
       alt={name}
       loading={loading}
@@ -58,6 +59,8 @@ const ProductImage = ({ src, name, className = '', loading = 'lazy' }: ProductIm
       className={`${className} ${fitClass}`}
     />
   );
-};
+});
+
+ProductImage.displayName = 'ProductImage';
 
 export default ProductImage;

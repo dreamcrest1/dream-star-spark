@@ -21,7 +21,16 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminSettings from "./pages/admin/AdminSettings";
+import AdminPages from "./pages/admin/AdminPages";
+import AdminBlogs from "./pages/admin/AdminBlogs";
+import AdminBlogEditor from "./pages/admin/AdminBlogEditor";
+import AdminBrandRules from "./pages/admin/AdminBrandRules";
+import AdminTheme from "./pages/admin/AdminTheme";
+import AdminMedia from "./pages/admin/AdminMedia";
+import AdminSEO from "./pages/admin/AdminSEO";
 import { usePageTracking } from "./hooks/usePageTracking";
+import ThemeInjector from "./components/ThemeInjector";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +56,15 @@ const AppShell = () => {
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/products" element={<AdminProducts />} />
         <Route path="/admin/analytics" element={<AdminAnalytics />} />
+        <Route path="/admin/settings" element={<AdminSettings />} />
+        <Route path="/admin/pages" element={<AdminPages />} />
+        <Route path="/admin/blogs" element={<AdminBlogs />} />
+        <Route path="/admin/blogs/new" element={<AdminBlogEditor />} />
+        <Route path="/admin/blogs/:id" element={<AdminBlogEditor />} />
+        <Route path="/admin/brand-rules" element={<AdminBrandRules />} />
+        <Route path="/admin/theme" element={<AdminTheme />} />
+        <Route path="/admin/media" element={<AdminMedia />} />
+        <Route path="/admin/seo" element={<AdminSEO />} />
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
@@ -72,6 +90,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ThemeInjector />
           <AppShell />
         </BrowserRouter>
       </TooltipProvider>

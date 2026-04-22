@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, AlertTriangle, XCircle, RefreshCw, ExternalLink } from 'lucide-react';
@@ -26,8 +26,7 @@ interface RouteCheck {
   loading: boolean;
 }
 
-// Discover all public routes from siteSettings + DB
-async function discoverRoutes(siteUrl: string): Promise<{ path: string; label: string }[]> {
+async function discoverRoutes(): Promise<{ path: string; label: string }[]> {
   const base: { path: string; label: string }[] = [
     { path: '/', label: 'Home' },
     { path: '/products', label: 'Products list' },
@@ -43,59 +42,79 @@ async function discoverRoutes(siteUrl: string): Promise<{ path: string; label: s
   return base;
 }
 
-async function checkRoute(path: string, label: string, siteUrl: string): Promise<RouteCheck> {
-  const url = `${siteUrl.replace(/\/$/, '')}${path}`;
-  const issues: string[] = [];
-  try {
-    // Fetch the rendered HTML. Same-origin so CORS is fine; works in production with prerendered metas.
-    // Note: SPA renders metas client-side via Helmet; this audit primarily validates the source HTML head.
-    const res = await fetch(path, { credentials: 'omit' });
-    const html = await res.text();
-    const get = (re: RegExp) => (html.match(re)?.[1] || '').trim();
+// Render the route in a hidden iframe, wait for Helmet to populate the head, then read it.
+function checkRouteInIframe(path: string, label: string, siteUrl: string, container: HTMLElement): Promise<RouteCheck> {
+  return new Promise((resolve) => {
+    const url = `${siteUrl.replace(/\/$/, '')}${path}`;
+    const issues: string[] = [];
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:absolute;width:1024px;height:768px;left:-9999px;top:-9999px;border:0;';
+    iframe.src = path;
+    container.appendChild(iframe);
 
-    const title = get(/<title[^>]*>([\s\S]*?)<\/title>/i);
-    const description = get(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i);
-    const canonical = get(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i);
-    const ogTitle = get(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i);
-    const ogDescription = get(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i);
-    const ogImage = get(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
-    const ogType = get(/<meta[^>]+property=["']og:type["'][^>]+content=["']([^"']+)["']/i);
-    const twitterCard = get(/<meta[^>]+name=["']twitter:card["'][^>]+content=["']([^"']+)["']/i);
-    const robots = get(/<meta[^>]+name=["']robots["'][^>]+content=["']([^"']+)["']/i);
-    const h1Matches = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/gi) || [];
-    const h1Count = h1Matches.length;
-    const h1Text = h1Matches[0]?.replace(/<[^>]+>/g, '').trim() || '';
+    const timeout = window.setTimeout(() => finish(), 8000);
 
-    // Validation rules
-    if (!title) issues.push('Missing <title>');
-    else if (title.length < 10) issues.push(`Title too short (${title.length} chars)`);
-    else if (title.length > 70) issues.push(`Title too long (${title.length} chars, recommended ≤60)`);
-    if (!description) issues.push('Missing meta description');
-    else if (description.length < 50) issues.push(`Description too short (${description.length} chars)`);
-    else if (description.length > 170) issues.push(`Description too long (${description.length} chars, recommended ≤160)`);
-    if (!canonical) issues.push('Missing canonical link');
-    if (!ogTitle) issues.push('Missing og:title');
-    if (!ogDescription) issues.push('Missing og:description');
-    if (!ogImage) issues.push('Missing og:image');
-    if (!twitterCard) issues.push('Missing twitter:card');
-    if (h1Count === 0) issues.push('No <h1> on page');
-    else if (h1Count > 1) issues.push(`${h1Count} <h1> tags (should be exactly 1)`);
+    const finish = () => {
+      window.clearTimeout(timeout);
+      try {
+        const doc = iframe.contentDocument;
+        if (!doc) throw new Error('Iframe document unavailable');
+        const head = doc.head;
+        const body = doc.body;
+        const get = (sel: string, attr = 'content') =>
+          (head.querySelector(sel) as HTMLMetaElement | HTMLLinkElement | null)?.getAttribute(attr) || '';
 
-    const noindex = /noindex/i.test(robots);
-    const status: 'ok' | 'warn' | 'error' = issues.length === 0 ? 'ok' : issues.length <= 2 ? 'warn' : 'error';
+        const title = doc.title || '';
+        const description = get('meta[name="description"]');
+        const canonical = get('link[rel="canonical"]', 'href');
+        const ogTitle = get('meta[property="og:title"]');
+        const ogDescription = get('meta[property="og:description"]');
+        const ogImage = get('meta[property="og:image"]');
+        const ogType = get('meta[property="og:type"]');
+        const twitterCard = get('meta[name="twitter:card"]');
+        const robots = get('meta[name="robots"]');
+        const h1s = body?.querySelectorAll('h1') || ([] as any);
+        const h1Count = h1s.length;
+        const h1Text = (h1s[0] as HTMLElement | undefined)?.innerText.trim() || '';
 
-    return {
-      path, label, url,
-      title, description, canonical, ogTitle, ogDescription, ogImage, ogType, twitterCard,
-      h1Count, h1Text, noindex, status, issues, loading: false,
+        if (!title) issues.push('Missing <title>');
+        else if (title.length < 10) issues.push(`Title too short (${title.length} chars)`);
+        else if (title.length > 70) issues.push(`Title too long (${title.length} chars, recommended ≤60)`);
+        if (!description) issues.push('Missing meta description');
+        else if (description.length < 50) issues.push(`Description too short (${description.length} chars)`);
+        else if (description.length > 170) issues.push(`Description too long (${description.length} chars, recommended ≤160)`);
+        if (!canonical) issues.push('Missing canonical link');
+        if (!ogTitle) issues.push('Missing og:title');
+        if (!ogDescription) issues.push('Missing og:description');
+        if (!ogImage) issues.push('Missing og:image');
+        if (!twitterCard) issues.push('Missing twitter:card');
+        if (h1Count === 0) issues.push('No <h1> on page');
+        else if (h1Count > 1) issues.push(`${h1Count} <h1> tags (should be exactly 1)`);
+
+        const noindex = /noindex/i.test(robots);
+        const status: 'ok' | 'warn' | 'error' = issues.length === 0 ? 'ok' : issues.length <= 2 ? 'warn' : 'error';
+
+        resolve({
+          path, label, url,
+          title, description, canonical, ogTitle, ogDescription, ogImage, ogType, twitterCard,
+          h1Count, h1Text, noindex, status, issues, loading: false,
+        });
+      } catch (e: any) {
+        resolve({
+          path, label, url, title: '', description: '', canonical: '', ogTitle: '', ogDescription: '',
+          ogImage: '', ogType: '', twitterCard: '', h1Count: 0, h1Text: '', noindex: false,
+          status: 'error', issues: [`Could not read iframe head: ${e.message}`], loading: false,
+        });
+      } finally {
+        try { container.removeChild(iframe); } catch { /* noop */ }
+      }
     };
-  } catch (e: any) {
-    return {
-      path, label, url, title: '', description: '', canonical: '', ogTitle: '', ogDescription: '',
-      ogImage: '', ogType: '', twitterCard: '', h1Count: 0, h1Text: '', noindex: false,
-      status: 'error', issues: [`Failed to fetch: ${e.message}`], loading: false,
-    };
-  }
+
+    iframe.addEventListener('load', () => {
+      // Wait for Helmet to hydrate the head, then read.
+      window.setTimeout(finish, 1500);
+    });
+  });
 }
 
 const StatusIcon = ({ status }: { status: 'ok' | 'warn' | 'error' }) => {
@@ -109,15 +128,16 @@ const AdminSEO = () => {
   const [results, setResults] = useState<RouteCheck[]>([]);
   const [loading, setLoading] = useState(false);
   const [siteUrl] = useState(window.location.origin);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const run = async () => {
+    if (!containerRef.current) return;
     setLoading(true);
     setResults([]);
-    const routes = await discoverRoutes(siteUrl);
-    // Run sequentially to be gentle; SPA fetch is fast
+    const routes = await discoverRoutes();
     const out: RouteCheck[] = [];
     for (const r of routes) {
-      const c = await checkRoute(r.path, r.label, siteUrl);
+      const c = await checkRouteInIframe(r.path, r.label, siteUrl, containerRef.current);
       out.push(c);
       setResults([...out]);
     }
@@ -144,11 +164,13 @@ const AdminSEO = () => {
 
       <Card className="p-4 mb-6 bg-muted/30">
         <p className="text-xs text-muted-foreground">
-          ℹ️ This audit fetches each page's HTML at <code>{siteUrl}</code>. Because this is a single-page app, meta tags
-          are injected client-side by react-helmet — the audit captures the final HTML head present in the document.
-          For best SEO results in search engines, also consider server-side prerendering for crawlers that don't run JS.
+          ℹ️ This audit renders each route in a hidden iframe and reads the live <code>&lt;head&gt;</code> after
+          react-helmet hydrates — exactly what real users and modern crawlers (Google/Bing) see. Each route gets
+          ~1.5s to render. For non-JS crawlers, consider server-side prerendering.
         </p>
       </Card>
+
+      <div ref={containerRef} aria-hidden />
 
       <div className="space-y-3">
         {results.map((r) => (

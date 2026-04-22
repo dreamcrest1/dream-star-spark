@@ -2,17 +2,20 @@ import { useParams, Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ExternalLink, Shield, Clock, Zap, Star, CheckCircle } from 'lucide-react';
-import { products } from '@/data/products';
+import { useProducts } from '@/hooks/useProducts';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import InteractiveBackground from '@/components/InteractiveBackground';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import ProductCard from '@/components/ProductCard';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const { products } = useProducts();
   const product = products.find(p => p.id === Number(id));
+
 
   // Scroll to top when component mounts or id changes
   useEffect(() => {

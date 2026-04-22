@@ -106,9 +106,14 @@ const Products = () => {
 
   return (
     <div className="min-h-screen relative">
+      <SEO
+        title="All Products – OTT Subscriptions, AI Tools, SEO & More"
+        description={`Browse ${products.length}+ premium digital products: Netflix, Prime Video, Disney+, ChatGPT, Canva, Adobe and more. Best prices in India. Trusted since 2021.`}
+        keywords="OTT subscriptions India, premium AI tools, Netflix subscription, Canva Pro, Adobe Creative Cloud, group buy tools, digital products India"
+      />
       <InteractiveBackground />
       <Navbar />
-      
+
       <main className="relative z-10 pt-24 pb-16">
         <div className="container mx-auto px-4">
           {/* Header */}

@@ -1,23 +1,27 @@
 import { motion } from 'framer-motion';
 import { CheckCircle, Users, Package, HeadphonesIcon } from 'lucide-react';
-
-const stats = [
-  { icon: Users, value: '15,000+', label: 'Happy Customers' },
-  { icon: Package, value: '200+', label: 'Products' },
-  { icon: HeadphonesIcon, value: '24/7', label: 'Support' },
-];
-
-const features = [
-  'Most Trusted Service Provider Since 2021',
-  'Genuine Products with Warranty',
-  'Instant Digital Delivery',
-  'Responsive Customer Support',
-];
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 const About = () => {
+  const { settings } = useSiteSettings();
+  const a = settings.about || {};
+  const footerData = settings.footer || {};
+
+  const stats = [
+    { icon: Users, value: footerData.customers || '15,000+', label: 'Happy Customers' },
+    { icon: Package, value: '200+', label: 'Products' },
+    { icon: HeadphonesIcon, value: '24/7', label: 'Support' },
+  ];
+
+  const features: string[] = a.features || [
+    'Most Trusted Service Provider Since 2021',
+    'Genuine Products with Warranty',
+    'Instant Digital Delivery',
+    'Responsive Customer Support',
+  ];
+
   return (
     <section className="relative py-20 px-4">
-      {/* Decorative Background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-neon-pink/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-neon-cyan/10 rounded-full blur-[100px]" />
@@ -25,25 +29,23 @@ const About = () => {
 
       <div className="relative max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
             <p className="text-sm font-display uppercase tracking-wider text-neon-purple mb-3">
-              About Us
+              {a.eyebrow || 'About Us'}
             </p>
             <h2 className="text-3xl md:text-4xl font-display font-bold mb-6">
-              <span className="text-neon-pink neon-text">Dreamcrest</span> Solutions
+              <span className="text-neon-pink neon-text">{a.titlePink || 'Dreamcrest'}</span>
+              {a.titleRest || ' Solutions'}
             </h2>
             <p className="text-muted-foreground font-body text-lg leading-relaxed mb-8">
-              Dreamcrest Group is a leading provider of OTT services and group buy tools at discounted prices. 
-              Founded in 2021, we've gained over 15,000+ customers and expanded our reach internationally. 
-              We're committed to providing genuine digital products at unbeatable prices.
+              {a.body ||
+                "Dreamcrest Group is a leading provider of OTT services and group buy tools at discounted prices. Founded in 2021, we've gained over 15,000+ customers and expanded our reach internationally. We're committed to providing genuine digital products at unbeatable prices."}
             </p>
 
-            {/* Features List */}
             <ul className="space-y-4 mb-8">
               {features.map((feature, index) => (
                 <motion.li
@@ -70,7 +72,6 @@ const About = () => {
             </motion.a>
           </motion.div>
 
-          {/* Right Stats */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -101,7 +102,6 @@ const About = () => {
               </motion.div>
             ))}
 
-            {/* Quality Badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}

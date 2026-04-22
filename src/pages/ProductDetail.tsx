@@ -25,6 +25,7 @@ const ProductDetail = () => {
   if (!product) {
     return (
       <div className="min-h-screen relative">
+        <SEO title="Product Not Found" description="The product you are looking for does not exist." noindex />
         <InteractiveBackground />
         <Navbar />
         <main className="relative z-10 pt-24 pb-16 flex items-center justify-center min-h-[60vh]">

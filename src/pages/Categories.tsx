@@ -6,6 +6,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import InteractiveBackground from '@/components/InteractiveBackground';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import SEO from '@/components/SEO';
+
 
 const categories = [
   { 

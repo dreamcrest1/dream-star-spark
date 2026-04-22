@@ -38,8 +38,31 @@ const BlogPost = () => {
 
   const relatedPosts = blogs.filter(b => b.category === blog.category && b.id !== blog.id).slice(0, 2);
 
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: blog.title,
+    description: blog.excerpt,
+    image: blog.image,
+    datePublished: blog.date,
+    author: { '@type': 'Person', name: blog.author },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Dreamstar Solution',
+      logo: { '@type': 'ImageObject', url: 'https://dreamstarsolution.com/logo.png' },
+    },
+  };
+
   return (
     <div className="min-h-screen relative">
+      <SEO
+        title={blog.title}
+        description={blog.excerpt}
+        keywords={`${blog.category}, ${blog.title}, dreamstar blog`}
+        image={blog.image}
+        type="article"
+        jsonLd={articleJsonLd}
+      />
       <InteractiveBackground />
       <Navbar />
 

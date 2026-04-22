@@ -198,7 +198,7 @@ const AdminMedia = () => {
 
               <div className="flex gap-1 mt-auto">
                 <Button size="sm" variant="ghost" className="h-7 flex-1" onClick={() => copy(m)}>
-                  {copiedId === m.id ? <Check className="w-3 h-3 mr-1 text-green-400" /> : <Copy className="w-3 h-3 mr-1" />}
+                  {copiedId === m.id ? <Check className="w-3 h-3 mr-1 text-primary" /> : <Copy className="w-3 h-3 mr-1" />}
                   URL
                 </Button>
                 <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => del(m)}>

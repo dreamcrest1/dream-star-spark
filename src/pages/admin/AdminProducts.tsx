@@ -287,8 +287,8 @@ const AdminProducts = () => {
                 autoFocus
               />
             </div>
-            <div className="flex items-start gap-2 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded p-3">
-              <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 text-xs text-destructive-foreground bg-destructive/10 border border-destructive/30 rounded p-3">
+              <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5 text-destructive" />
               <span>
                 This will overwrite the current Buy URL on <strong>{items.length}</strong> product{items.length === 1 ? '' : 's'}. There is no undo — make sure the URL is correct.
               </span>

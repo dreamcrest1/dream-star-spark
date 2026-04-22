@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, BarChart3, LogOut, Home,
   Settings, FileText, BookOpen, Tag, Palette, Image, Search,
+  Layout, Layers,
 } from 'lucide-react';
 import { isAdmin, logoutAdmin } from '@/lib/adminAuth';
 import { Button } from '@/components/ui/button';
@@ -10,11 +11,13 @@ import SEO from '@/components/SEO';
 
 const links = [
   { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/admin/page-builder', label: 'Page Builder', icon: Layout },
   { to: '/admin/products', label: 'Products', icon: Package },
   { to: '/admin/blogs', label: 'Blogs', icon: BookOpen },
   { to: '/admin/pages', label: 'Pages (Hero/About)', icon: FileText },
   { to: '/admin/settings', label: 'Site Settings', icon: Settings },
   { to: '/admin/theme', label: 'Theme', icon: Palette },
+  { to: '/admin/theme-presets', label: 'Theme Presets', icon: Layers },
   { to: '/admin/media', label: 'Media Library', icon: Image },
   { to: '/admin/brand-rules', label: 'Brand Logo Rules', icon: Tag },
   { to: '/admin/seo', label: 'SEO Audit', icon: Search },

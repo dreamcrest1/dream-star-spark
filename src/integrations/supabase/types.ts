@@ -14,6 +14,120 @@ export type Database = {
   }
   public: {
     Tables: {
+      blogs: {
+        Row: {
+          author: string
+          category: string
+          content: string
+          created_at: string
+          excerpt: string
+          id: number
+          image: string
+          published: boolean
+          published_at: string
+          read_time: string
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string
+          category?: string
+          content?: string
+          created_at?: string
+          excerpt?: string
+          id?: number
+          image?: string
+          published?: boolean
+          published_at?: string
+          read_time?: string
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          category?: string
+          content?: string
+          created_at?: string
+          excerpt?: string
+          id?: number
+          image?: string
+          published?: boolean
+          published_at?: string
+          read_time?: string
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      brand_rules: {
+        Row: {
+          created_at: string
+          domain: string
+          id: number
+          notes: string | null
+          pattern: string
+          priority: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          domain: string
+          id?: number
+          notes?: string | null
+          pattern: string
+          priority?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          domain?: string
+          id?: number
+          notes?: string | null
+          pattern?: string
+          priority?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      media: {
+        Row: {
+          created_at: string
+          id: number
+          mime_type: string | null
+          name: string
+          path: string
+          size_bytes: number | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          mime_type?: string | null
+          name?: string
+          path: string
+          size_bytes?: number | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          mime_type?: string | null
+          name?: string
+          path?: string
+          size_bytes?: number | null
+          url?: string
+        }
+        Relationships: []
+      }
       page_views: {
         Row: {
           created_at: string
@@ -80,6 +194,24 @@ export type Database = {
           regular_price?: number
           sale_price?: number | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
         }
         Relationships: []
       }

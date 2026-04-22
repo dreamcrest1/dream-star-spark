@@ -61,11 +61,16 @@ const AdminDashboard = () => {
       </div>
 
       <Card className="p-6 mt-8">
-        <h2 className="font-display text-xl font-bold mb-3">Quick Actions</h2>
-        <div className="text-sm text-muted-foreground space-y-2">
-          <p>• Manage your product catalog from <a href="/admin/products" className="text-primary underline">Products</a></p>
-          <p>• View detailed visitor analytics in <a href="/admin/analytics" className="text-primary underline">Analytics</a></p>
-          <p>• All changes appear instantly on the live site</p>
+        <h2 className="font-display text-xl font-bold mb-3">CMS Quick Actions</h2>
+        <div className="grid md:grid-cols-2 gap-3 text-sm">
+          <a href="/admin/products" className="p-3 rounded-lg border border-border hover:border-primary transition-colors">📦 <strong>Products</strong> – add/edit/delete & set per-product redirect URL</a>
+          <a href="/admin/blogs" className="p-3 rounded-lg border border-border hover:border-primary transition-colors">📝 <strong>Blogs</strong> – full CMS with SEO fields</a>
+          <a href="/admin/pages" className="p-3 rounded-lg border border-border hover:border-primary transition-colors">📄 <strong>Pages</strong> – edit Hero & About sections</a>
+          <a href="/admin/settings" className="p-3 rounded-lg border border-border hover:border-primary transition-colors">⚙️ <strong>Site Settings</strong> – header, footer, contact, social, SEO defaults</a>
+          <a href="/admin/theme" className="p-3 rounded-lg border border-border hover:border-primary transition-colors">🎨 <strong>Theme</strong> – colors & presets</a>
+          <a href="/admin/media" className="p-3 rounded-lg border border-border hover:border-primary transition-colors">🖼️ <strong>Media Library</strong> – upload images</a>
+          <a href="/admin/brand-rules" className="p-3 rounded-lg border border-border hover:border-primary transition-colors">🏷️ <strong>Brand Logo Rules</strong> – fix broken product images</a>
+          <a href="/admin/seo" className="p-3 rounded-lg border border-border hover:border-primary transition-colors">🔍 <strong>SEO Audit</strong> – validate every page</a>
         </div>
       </Card>
     </AdminLayout>

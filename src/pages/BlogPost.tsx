@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Clock, Calendar, User, Share2 } from 'lucide-react';
-import { blogs } from '@/data/blogs';
+import { useBlogsWithFallback } from '@/hooks/useBlogsWithFallback';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import InteractiveBackground from '@/components/InteractiveBackground';
@@ -12,7 +12,8 @@ import { Button } from '@/components/ui/button';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
-  const blog = blogs.find(b => b.slug === slug);
+  const { blogs } = useBlogsWithFallback();
+  const blog = blogs.find((b: any) => b.slug === slug);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -36,7 +37,7 @@ const BlogPost = () => {
     );
   }
 
-  const relatedPosts = blogs.filter(b => b.category === blog.category && b.id !== blog.id).slice(0, 2);
+  const relatedPosts = blogs.filter((b: any) => b.category === blog.category && b.id !== blog.id).slice(0, 2);
 
   const articleJsonLd = {
     '@context': 'https://schema.org',
@@ -44,7 +45,7 @@ const BlogPost = () => {
     headline: blog.title,
     description: blog.excerpt,
     image: blog.image,
-    datePublished: blog.date,
+    datePublished: (blog as any).published_at || (blog as any).date,
     author: { '@type': 'Person', name: blog.author },
     publisher: {
       '@type': 'Organization',
@@ -56,8 +57,8 @@ const BlogPost = () => {
   return (
     <div className="min-h-screen relative">
       <SEO
-        title={blog.title}
-        description={blog.excerpt}
+        title={(blog as any).seo_title || blog.title}
+        description={(blog as any).seo_description || blog.excerpt}
         keywords={`${blog.category}, ${blog.title}, dreamstar blog`}
         image={blog.image}
         type="article"
@@ -109,7 +110,7 @@ const BlogPost = () => {
             </span>
             <span className="flex items-center gap-1 text-sm text-muted-foreground">
               <Calendar className="w-4 h-4" />
-              {new Date(blog.date).toLocaleDateString('en-US', { 
+              {new Date((blog as any).published_at || (blog as any).date).toLocaleDateString('en-US', { 
                 month: 'long', 
                 day: 'numeric',
                 year: 'numeric'
@@ -117,7 +118,7 @@ const BlogPost = () => {
             </span>
             <span className="flex items-center gap-1 text-sm text-muted-foreground">
               <Clock className="w-4 h-4" />
-              {blog.readTime} read
+              {(blog as any).read_time || (blog as any).readTime} read
             </span>
             <span className="flex items-center gap-1 text-sm text-muted-foreground">
               <User className="w-4 h-4" />
@@ -197,7 +198,7 @@ const BlogPost = () => {
                       />
                       <div>
                         <h4 className="font-display font-bold mb-2 line-clamp-2">{post.title}</h4>
-                        <span className="text-xs text-muted-foreground">{post.readTime}</span>
+                        <span className="text-xs text-muted-foreground">{(post as any).read_time || (post as any).readTime}</span>
                       </div>
                     </motion.div>
                   </Link>

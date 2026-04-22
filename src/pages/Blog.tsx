@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Clock, User, Calendar, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { blogs } from '@/data/blogs';
+import { useBlogsWithFallback } from '@/hooks/useBlogsWithFallback';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import InteractiveBackground from '@/components/InteractiveBackground';
@@ -9,6 +9,7 @@ import WhatsAppButton from '@/components/WhatsAppButton';
 import SEO from '@/components/SEO';
 
 const Blog = () => {
+  const { blogs } = useBlogsWithFallback();
   return (
     <div className="min-h-screen relative">
       <SEO
@@ -83,7 +84,7 @@ const Blog = () => {
                         <div className="flex items-center gap-4">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
-                            {new Date(blog.date).toLocaleDateString('en-US', { 
+                            {new Date(blog.published_at).toLocaleDateString('en-US', { 
                               month: 'short', 
                               day: 'numeric',
                               year: 'numeric'
@@ -91,7 +92,7 @@ const Blog = () => {
                           </span>
                           <span className="flex items-center gap-1">
                             <Clock className="w-3 h-3" />
-                            {blog.readTime}
+                            {blog.read_time}
                           </span>
                         </div>
                         <motion.span

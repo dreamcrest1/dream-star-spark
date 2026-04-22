@@ -2,19 +2,19 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
-import { products } from '@/data/products';
-
-// Get top 8 products with discounts
-const featuredProducts = products
-  .filter(p => p.salePrice !== null)
-  .sort((a, b) => {
-    const discountA = a.salePrice ? ((a.regularPrice - a.salePrice) / a.regularPrice) * 100 : 0;
-    const discountB = b.salePrice ? ((b.regularPrice - b.salePrice) / b.regularPrice) * 100 : 0;
-    return discountB - discountA;
-  })
-  .slice(0, 8);
+import { useProducts } from '@/hooks/useProducts';
 
 const FeaturedProducts = () => {
+  const { products } = useProducts();
+  const featuredProducts = products
+    .filter(p => p.salePrice !== null)
+    .sort((a, b) => {
+      const discountA = a.salePrice ? ((a.regularPrice - a.salePrice) / a.regularPrice) * 100 : 0;
+      const discountB = b.salePrice ? ((b.regularPrice - b.salePrice) / b.regularPrice) * 100 : 0;
+      return discountB - discountA;
+    })
+    .slice(0, 8);
+
   return (
     <section className="relative py-20 px-4">
       <div className="max-w-7xl mx-auto">
@@ -76,7 +76,7 @@ const FeaturedProducts = () => {
               whileTap={{ scale: 0.95 }}
               className="px-8 py-4 rounded-xl font-display font-bold uppercase tracking-wider text-sm border-2 border-neon-pink text-neon-pink hover:bg-neon-pink/10 transition-colors"
             >
-              Explore All 132 Products
+              Explore All {products.length} Products
             </motion.button>
           </Link>
         </motion.div>

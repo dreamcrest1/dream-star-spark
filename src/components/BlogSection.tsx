@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Clock, User, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { blogs } from '@/data/blogs';
+import { useBlogsWithFallback } from '@/hooks/useBlogsWithFallback';
 
 const BlogSection = () => {
+  const { blogs } = useBlogsWithFallback();
   const featuredBlogs = blogs.slice(0, 3);
 
   return (
@@ -73,14 +74,14 @@ const BlogSection = () => {
                       <div className="flex items-center gap-4">
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
-                          {new Date(blog.date).toLocaleDateString('en-US', { 
+                          {new Date((blog as any).published_at || (blog as any).date).toLocaleDateString('en-US', { 
                             month: 'short', 
                             day: 'numeric' 
                           })}
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" />
-                          {blog.readTime}
+                          {(blog as any).read_time || (blog as any).readTime}
                         </span>
                       </div>
                       <motion.span

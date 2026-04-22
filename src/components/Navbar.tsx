@@ -2,17 +2,14 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Search, ShoppingBag, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-const navLinks = [
-  { name: 'Home', href: '/' },
-  { name: 'Products', href: '/products' },
-  { name: 'Contact', href: '/contact' },
-  { name: 'Terms', href: '/terms' },
-];
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { settings } = useSiteSettings();
+  const header = settings.header || {};
+  const navLinks = header.navLinks || [];
 
   return (
     <motion.nav
@@ -29,8 +26,8 @@ const Navbar = () => {
               whileHover={{ scale: 1.05 }}
               className="font-display text-xl md:text-2xl font-bold tracking-wider"
             >
-              <span className="text-neon-pink neon-text">DREAM</span>
-              <span className="text-neon-cyan neon-text-cyan">STAR</span>
+              <span className="text-neon-pink neon-text">{header.logoTextPink || 'DREAM'}</span>
+              <span className="text-neon-cyan neon-text-cyan">{header.logoTextCyan || 'STAR'}</span>
             </motion.div>
           </Link>
 

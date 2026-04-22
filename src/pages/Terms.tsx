@@ -20,6 +20,11 @@ const Terms = () => {
 
   return (
     <div className="min-h-screen relative">
+      <SEO
+        title="Terms & Conditions – Dreamstar Solution"
+        description="Read our terms, refund policy, warranty info and AMC details. Trusted OTT and digital service provider since 2021."
+        keywords="dreamstar terms, refund policy, warranty, AMC"
+      />
       <InteractiveBackground />
       <Navbar />
       

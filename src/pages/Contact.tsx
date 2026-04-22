@@ -45,6 +45,11 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen relative">
+      <SEO
+        title="Contact Us – Get in Touch with Dreamstar Solution"
+        description={`Contact Dreamstar Solution for OTT subscriptions and digital services. Call ${contact.mainPhone} or email ${contact.email}. Based in Gandhinagar, Gujarat.`}
+        keywords="contact dreamstar solution, OTT support India, customer service, WhatsApp support"
+      />
       <InteractiveBackground />
       <Navbar />
       

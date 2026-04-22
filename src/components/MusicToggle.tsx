@@ -11,7 +11,7 @@ const MusicToggle = () => {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const soundRef = useRef<Howl | null>(null);
-  const progressInterval = useRef<NodeJS.Timeout>();
+  const progressInterval = useRef<ReturnType<typeof setInterval>>();
 
   useEffect(() => {
     soundRef.current = new Howl({

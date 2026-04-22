@@ -10,6 +10,7 @@ import WhatsAppButton from '@/components/WhatsAppButton';
 import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import ProductCard from '@/components/ProductCard';
+import ProductImage from '@/components/ProductImage';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -116,10 +117,11 @@ const ProductDetail = () => {
                     <span className="font-display font-bold text-white">{discount}% OFF</span>
                   </div>
                 )}
-                <img
+                <ProductImage
                   src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
+                  name={product.name}
+                  className="w-full h-full"
+                  loading="eager"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
               </div>

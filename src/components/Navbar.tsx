@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Search, ShoppingBag } from 'lucide-react';
+import { Menu, X, Search, ShoppingBag, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const navLinks = [
@@ -49,7 +49,26 @@ const Navbar = () => {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-3">
+            {/* Admin */}
+            <Link
+              to="/admin"
+              title="Admin Panel"
+              aria-label="Admin Panel"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-neon-cyan/40 bg-neon-cyan/10 text-neon-cyan text-xs font-display font-bold uppercase tracking-wider hover:bg-neon-cyan/20 hover:border-neon-cyan transition-colors"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              Admin
+            </Link>
+            <Link
+              to="/admin"
+              title="Admin Panel"
+              aria-label="Admin Panel"
+              className="sm:hidden p-2 rounded-full border border-neon-cyan/40 bg-neon-cyan/10 text-neon-cyan hover:bg-neon-cyan/20 transition-colors"
+            >
+              <Lock className="w-4 h-4" />
+            </Link>
+
             {/* Search */}
             <motion.button
               onClick={() => setIsSearchOpen(!isSearchOpen)}

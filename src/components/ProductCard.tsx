@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { ExternalLink, Sparkles, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { type Product } from '@/data/products';
+import ProductImage from '@/components/ProductImage';
 
 interface ProductCardProps {
   product: Product;
@@ -33,11 +34,10 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
 
         {/* Image Container */}
         <div className="relative aspect-square overflow-hidden bg-deep-purple">
-          <img
+          <ProductImage
             src={image}
-            alt={name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-            loading="lazy"
+            name={name}
+            className="w-full h-full group-hover:scale-110 transition-transform duration-500"
           />
           
           {/* Glitch Overlay on Hover */}

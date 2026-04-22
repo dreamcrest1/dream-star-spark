@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import AdminLayout from './AdminLayout';
+import ProductImage from '@/components/ProductImage';
 
 interface ProductRow {
   id: number;
@@ -129,7 +130,9 @@ const AdminProducts = () => {
             {filtered.map((p) => (
               <TableRow key={p.id}>
                 <TableCell>
-                  {p.image ? <img src={p.image} alt={p.name} className="w-12 h-12 rounded object-cover" loading="lazy" /> : null}
+                  <div className="w-12 h-12 rounded overflow-hidden bg-muted">
+                    <ProductImage src={p.image} name={p.name} className="w-full h-full" />
+                  </div>
                 </TableCell>
                 <TableCell className="font-medium">{p.name}</TableCell>
                 <TableCell><span className="text-xs px-2 py-1 rounded bg-muted">{p.category}</span></TableCell>

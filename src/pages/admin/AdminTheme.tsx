@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,7 +33,9 @@ const AdminTheme = () => {
   const [theme, setTheme] = useState<any>(null);
   const [saving, setSaving] = useState(false);
 
-  if (!loading && theme === null) setTheme(structuredClone(settings.theme));
+  useEffect(() => {
+    if (!loading && theme === null) setTheme(structuredClone(settings.theme));
+  }, [loading, settings, theme]);
 
   const save = async () => {
     setSaving(true);

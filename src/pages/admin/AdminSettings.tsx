@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,13 +23,15 @@ const AdminSettings = () => {
   const [seo, setSeo] = useState<any>(null);
 
   // Initialize once settings load
-  if (!loading && header === null) {
-    setHeader(structuredClone(settings.header));
-    setFooter(structuredClone(settings.footer));
-    setContact(structuredClone(settings.contact));
-    setSocial(structuredClone(settings.social));
-    setSeo(structuredClone(settings.seo));
-  }
+  useEffect(() => {
+    if (!loading && header === null) {
+      setHeader(structuredClone(settings.header));
+      setFooter(structuredClone(settings.footer));
+      setContact(structuredClone(settings.contact));
+      setSocial(structuredClone(settings.social));
+      setSeo(structuredClone(settings.seo));
+    }
+  }, [loading, settings, header]);
 
   const save = async (key: string, value: any) => {
     try {

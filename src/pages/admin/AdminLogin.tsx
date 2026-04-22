@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useEffect, useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock } from 'lucide-react';
 import { loginAdmin, isAdmin } from '@/lib/adminAuth';
@@ -14,9 +14,9 @@ const AdminLogin = () => {
   const { toast } = useToast();
   const [password, setPassword] = useState('');
 
-  if (isAdmin()) {
-    navigate('/admin/dashboard', { replace: true });
-  }
+  useEffect(() => {
+    if (isAdmin()) navigate('/admin/dashboard', { replace: true });
+  }, [navigate]);
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();

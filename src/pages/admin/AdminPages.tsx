@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,10 +17,12 @@ const AdminPages = () => {
   const [about, setAbout] = useState<any>(null);
   const [saving, setSaving] = useState(false);
 
-  if (!loading && hero === null) {
-    setHero(structuredClone(settings.hero));
-    setAbout(structuredClone(settings.about));
-  }
+  useEffect(() => {
+    if (!loading && hero === null) {
+      setHero(structuredClone(settings.hero));
+      setAbout(structuredClone(settings.about));
+    }
+  }, [loading, settings, hero]);
 
   const save = async (key: string, value: any) => {
     try {

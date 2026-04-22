@@ -10,14 +10,34 @@ import FeaturedProducts from '@/components/FeaturedProducts';
 import BlogSection from '@/components/BlogSection';
 import About from '@/components/About';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
+
+const homeJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Dreamstar Solution',
+  url: 'https://dreamstarsolution.com',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: 'https://dreamstarsolution.com/products?search={search_term_string}',
+    'query-input': 'required name=search_term_string',
+  },
+};
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   return (
     <>
+      <SEO
+        title="Dreamstar Solution – India's Most Trusted OTT & Digital Services Provider"
+        description="Premium OTT subscriptions, streaming services, and group buy tools at affordable prices. Netflix, Prime Video, Disney+ Hotstar, and 200+ products. Trusted by 15,000+ customers since 2021."
+        keywords="OTT services India, Netflix India, Prime Video, Disney Hotstar, streaming services, group buy tools, digital services, Dreamstar Solution, affordable OTT, premium subscriptions, Movie Box Pro, IPTV, VPN services"
+        canonical="https://dreamstarsolution.com/"
+        jsonLd={homeJsonLd}
+      />
       {isLoading && <Preloader onComplete={() => setIsLoading(false)} />}
-      
+
       {!isLoading && (
         <div className="relative min-h-screen">
           <InteractiveBackground />

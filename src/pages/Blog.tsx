@@ -6,10 +6,16 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import InteractiveBackground from '@/components/InteractiveBackground';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import SEO from '@/components/SEO';
 
 const Blog = () => {
   return (
     <div className="min-h-screen relative">
+      <SEO
+        title="Blog – Tips, Guides & Insights on OTT, AI Tools & Streaming"
+        description="Read our latest articles about Netflix, Prime Video, AI tools, productivity software and digital services. Expert tips & honest reviews."
+        keywords="OTT blog India, streaming guides, AI tools reviews, Netflix tips, Prime Video, productivity blog"
+      />
       <InteractiveBackground />
       <Navbar />
 

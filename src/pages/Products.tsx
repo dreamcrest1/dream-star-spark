@@ -2,12 +2,13 @@ import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, X } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { products, type Product } from '@/data/products';
+import { useProducts } from '@/hooks/useProducts';
 import ProductCard from '@/components/ProductCard';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import InteractiveBackground from '@/components/InteractiveBackground';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import SEO from '@/components/SEO';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+
 
 // Category mapping from URL slugs to actual category names
 const categoryMap: Record<string, string> = {
@@ -35,7 +37,8 @@ const categoryMap: Record<string, string> = {
 const Products = () => {
   const [searchParams] = useSearchParams();
   const categoryFromUrl = searchParams.get('category');
-  
+  const { products } = useProducts();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('name');
@@ -56,7 +59,8 @@ const Products = () => {
   const categories = useMemo(() => {
     const cats = [...new Set(products.map((p) => p.category))];
     return cats.sort();
-  }, []);
+  }, [products]);
+
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
@@ -98,13 +102,18 @@ const Products = () => {
     }
 
     return result;
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [searchQuery, selectedCategory, sortBy, products]);
 
   return (
     <div className="min-h-screen relative">
+      <SEO
+        title="All Products – OTT Subscriptions, AI Tools, SEO & More"
+        description={`Browse ${products.length}+ premium digital products: Netflix, Prime Video, Disney+, ChatGPT, Canva, Adobe and more. Best prices in India. Trusted since 2021.`}
+        keywords="OTT subscriptions India, premium AI tools, Netflix subscription, Canva Pro, Adobe Creative Cloud, group buy tools, digital products India"
+      />
       <InteractiveBackground />
       <Navbar />
-      
+
       <main className="relative z-10 pt-24 pb-16">
         <div className="container mx-auto px-4">
           {/* Header */}

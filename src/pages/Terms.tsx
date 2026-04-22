@@ -5,9 +5,11 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import InteractiveBackground from '@/components/InteractiveBackground';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import SEO from '@/components/SEO';
 
 const Terms = () => {
   const { terms, company } = siteContent;
+
 
   const policyHighlights = [
     { icon: Shield, title: 'All Sales Final', desc: 'No refunds except as specified', color: 'neon-pink' },
@@ -18,6 +20,11 @@ const Terms = () => {
 
   return (
     <div className="min-h-screen relative">
+      <SEO
+        title="Terms & Conditions – Dreamstar Solution"
+        description="Read our terms, refund policy, warranty info and AMC details. Trusted OTT and digital service provider since 2021."
+        keywords="dreamstar terms, refund policy, warranty, AMC"
+      />
       <InteractiveBackground />
       <Navbar />
       

@@ -407,7 +407,7 @@ const ReactionGame = ({ onBack }: { onBack: () => void }) => {
     const saved = localStorage.getItem('reactionBest');
     return saved ? parseInt(saved) : 999;
   });
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const startGame = () => {
     setState('ready');

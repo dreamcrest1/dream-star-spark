@@ -6,6 +6,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import InteractiveBackground from '@/components/InteractiveBackground';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import SEO from '@/components/SEO';
+
 
 const categories = [
   { 
@@ -98,6 +100,11 @@ const Categories = () => {
 
   return (
     <div className="min-h-screen relative">
+      <SEO
+        title="All Categories – OTT, AI Tools, SEO, Software & More"
+        description="Explore product categories: AI Tools, Video Editing, Writing Tools, OTT Subscriptions, SEO, Software and more. Premium digital services at the best prices."
+        keywords="OTT categories, AI tools category, premium software India, digital product categories"
+      />
       <InteractiveBackground />
       <Navbar />
       

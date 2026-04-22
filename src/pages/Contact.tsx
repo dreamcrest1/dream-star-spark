@@ -5,10 +5,12 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import InteractiveBackground from '@/components/InteractiveBackground';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 
 const Contact = () => {
   const { contact, social, company, relatedBrands } = siteContent;
+
 
   const contactItems = [
     {
@@ -43,6 +45,11 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen relative">
+      <SEO
+        title="Contact Us – Get in Touch with Dreamstar Solution"
+        description={`Contact Dreamstar Solution for OTT subscriptions and digital services. Call ${contact.mainPhone} or email ${contact.email}. Based in Gandhinagar, Gujarat.`}
+        keywords="contact dreamstar solution, OTT support India, customer service, WhatsApp support"
+      />
       <InteractiveBackground />
       <Navbar />
       

@@ -2,8 +2,12 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Zap, Shield, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import heroBg from '@/assets/hero-bg.jpg';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 const Hero = () => {
+  const { settings } = useSiteSettings();
+  const h = settings.hero || {};
+
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-24 pb-16 px-4 overflow-hidden">
       {/* Background Video */}
@@ -32,7 +36,7 @@ const Hero = () => {
         >
           <Zap className="w-4 h-4 text-neon-cyan" />
           <span className="text-sm font-body font-semibold text-neon-cyan uppercase tracking-wider">
-            Instant Digital Delivery
+            {h.badge || 'Instant Digital Delivery'}
           </span>
         </motion.div>
 
@@ -43,13 +47,13 @@ const Hero = () => {
           transition={{ delay: 0.4 }}
           className="text-4xl md:text-6xl lg:text-7xl font-display font-bold leading-tight mb-6"
         >
-          <span className="block text-foreground">Premium Digital</span>
+          <span className="block text-foreground">{h.heading1 || 'Premium Digital'}</span>
           <span className="block mt-2">
-            <span className="text-neon-pink neon-text">Products</span>
-            <span className="text-foreground"> at </span>
-            <span className="text-neon-cyan neon-text-cyan">Unreal</span>
+            <span className="text-neon-pink neon-text">{h.heading2Pink || 'Products'}</span>
+            <span className="text-foreground">{h.heading2Mid || ' at '}</span>
+            <span className="text-neon-cyan neon-text-cyan">{h.heading2Cyan || 'Unreal'}</span>
           </span>
-          <span className="block text-foreground mt-2">Prices</span>
+          <span className="block text-foreground mt-2">{h.heading3 || 'Prices'}</span>
         </motion.h1>
 
         {/* Subheading */}
@@ -59,8 +63,8 @@ const Hero = () => {
           transition={{ delay: 0.5 }}
           className="max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground font-body mb-10"
         >
-          Access top-tier AI tools, OTT subscriptions, premium software & more.
-          <span className="text-neon-pink"> Up to 80% OFF</span> on all digital products.
+          {h.subheading || 'Access top-tier AI tools, OTT subscriptions, premium software & more.'}
+          <span className="text-neon-pink"> {h.highlight || 'Up to 80% OFF on all digital products.'}</span>
         </motion.p>
 
         {/* CTA Buttons */}
@@ -70,14 +74,14 @@ const Hero = () => {
           transition={{ delay: 0.6 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <Link to="/products">
+          <Link to={h.ctaPrimaryHref || '/products'}>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="group relative px-8 py-4 bg-gradient-to-r from-neon-pink to-neon-purple rounded-xl font-display font-bold uppercase tracking-wider text-sm overflow-hidden"
             >
               <span className="relative z-10 flex items-center gap-2">
-                Explore Products
+                {h.ctaPrimary || 'Explore Products'}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </span>
               <motion.div
@@ -89,13 +93,13 @@ const Hero = () => {
             </motion.button>
           </Link>
 
-          <Link to="/categories">
+          <Link to={h.ctaSecondaryHref || '/categories'}>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="px-8 py-4 rounded-xl font-display font-bold uppercase tracking-wider text-sm border-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10 transition-colors"
             >
-              View Categories
+              {h.ctaSecondary || 'View Categories'}
             </motion.button>
           </Link>
         </motion.div>

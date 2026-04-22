@@ -28,6 +28,8 @@ Allow: /
 Disallow: /assets/
 Disallow: /*.json$
 Disallow: /api/
+Disallow: /admin
+Disallow: /admin/
 
 # Crawl-delay for aggressive bots
 User-agent: AhrefsBot

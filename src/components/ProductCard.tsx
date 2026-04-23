@@ -3,6 +3,7 @@ import { ExternalLink, Sparkles, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { type Product } from '@/data/products';
 import ProductImage from '@/components/ProductImage';
+import { trackProductClick } from '@/lib/trackClick';
 
 interface ProductCardProps {
   product: Product;
@@ -63,6 +64,7 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
               href={externalUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackProductClick({ id, name })}
               className="px-4 py-2 bg-gradient-to-r from-neon-pink to-neon-purple rounded-xl font-display font-bold uppercase text-xs flex items-center gap-2 hover:scale-105 transition-transform text-white"
             >
               Buy Now

@@ -11,6 +11,7 @@ import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import ProductCard from '@/components/ProductCard';
 import ProductImage from '@/components/ProductImage';
+import { trackProductClick } from '@/lib/trackClick';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -190,6 +191,7 @@ const ProductDetail = () => {
                 href={product.externalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackProductClick({ id: product.id, name: product.name })}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="w-full inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan rounded-xl font-display font-bold text-lg uppercase tracking-wider text-white shadow-lg shadow-neon-pink/30 hover:shadow-xl hover:shadow-neon-pink/40 transition-shadow"

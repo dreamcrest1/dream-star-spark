@@ -133,7 +133,9 @@ export type Database = {
       }
       page_views: {
         Row: {
+          country: string | null
           created_at: string
+          device: string | null
           id: number
           path: string
           referrer: string | null
@@ -141,7 +143,9 @@ export type Database = {
           visitor_id: string | null
         }
         Insert: {
+          country?: string | null
           created_at?: string
+          device?: string | null
           id?: number
           path: string
           referrer?: string | null
@@ -149,11 +153,46 @@ export type Database = {
           visitor_id?: string | null
         }
         Update: {
+          country?: string | null
           created_at?: string
+          device?: string | null
           id?: number
           path?: string
           referrer?: string | null
           user_agent?: string | null
+          visitor_id?: string | null
+        }
+        Relationships: []
+      }
+      product_clicks: {
+        Row: {
+          country: string | null
+          created_at: string
+          device: string | null
+          id: number
+          product_id: number | null
+          product_name: string | null
+          source_path: string | null
+          visitor_id: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          id?: number
+          product_id?: number | null
+          product_name?: string | null
+          source_path?: string | null
+          visitor_id?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          id?: number
+          product_id?: number | null
+          product_name?: string | null
+          source_path?: string | null
           visitor_id?: string | null
         }
         Relationships: []

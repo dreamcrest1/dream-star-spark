@@ -17,6 +17,7 @@ import StickmanMascot from "./components/StickmanMascot";
 import MusicToggle from "./components/MusicToggle";
 import WhatsAppButton from "./components/WhatsAppButton";
 import FloatingGame from "./components/FloatingGame";
+import AiConcierge from "./components/AiConcierge";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
@@ -81,6 +82,7 @@ const AppShell = () => {
           <MusicToggle />
           <WhatsAppButton />
           <FloatingGame />
+          <AiConcierge />
         </>
       )}
     </>

@@ -1,21 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-
-const VISITOR_KEY = 'dss_visitor_id';
-
-function getVisitorId(): string {
-  try {
-    let id = localStorage.getItem(VISITOR_KEY);
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem(VISITOR_KEY, id);
-    }
-    return id;
-  } catch {
-    return 'anonymous';
-  }
-}
+import { detectDevice, getVisitorId } from '@/lib/trackClick';
 
 export function usePageTracking() {
   const location = useLocation();
@@ -32,6 +18,7 @@ export function usePageTracking() {
         referrer: document.referrer || null,
         user_agent: navigator.userAgent,
         visitor_id,
+        device: detectDevice(),
       })
       .then(() => {});
   }, [location.pathname]);
